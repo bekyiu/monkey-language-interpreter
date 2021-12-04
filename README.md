@@ -1,0 +1,1 @@
+aim to learn kotlin and interpreter/compiler
