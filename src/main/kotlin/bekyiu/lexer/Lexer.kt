@@ -1,14 +1,14 @@
-package bekyiu
+package bekyiu.lexer
 
 /**
  * @Date 2021/12/4 12:00 下午
  * @Created by bekyiu
  */
 class Lexer(
-    private val input: String,
-    private var position: Int,
-    private var readPosition: Int,
-    private var ch: Char?
+    val input: String,
+    var position: Int,
+    var readPosition: Int,
+    var ch: Char?
 ) {
     companion object {
         // keyword map to it's token type

@@ -1,5 +1,7 @@
 package bekyiu
 
+import bekyiu.lexer.Lexer
+import bekyiu.lexer.TokenType
 import java.util.*
 
 /**

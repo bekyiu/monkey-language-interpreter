@@ -1,4 +1,4 @@
-package bekyiu
+package bekyiu.lexer
 
 import org.junit.Test
 
@@ -9,7 +9,7 @@ import org.junit.Test
  */
 class LexerTest {
     @Test
-    fun lexerTest() {
+    fun testLexer() {
         val source = """
         let five = 5;
         let ten = 10;
