@@ -38,6 +38,25 @@ class ParserTest {
     }
 
     @Test
+    fun testReturnStatements() {
+        val code = """
+            return 10;
+            return 100;
+            return 1023423;
+        """
+        val lexer = Lexer(code)
+        val parser = Parser(lexer)
+
+        val program = parser.parseProgram()
+
+        assert(program.statements.size == 3)
+
+        for (stmt in program.statements) {
+            assert(stmt.tokenLiteral() == "return")
+        }
+    }
+
+    @Test
     fun testParseError() {
         val code = """
             let x  5;

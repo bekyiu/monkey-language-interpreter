@@ -39,8 +39,21 @@ class Parser(
     private fun parseStatement(): Statement? {
         return when (curToken.type) {
             TokenType.LET -> parseLetStatement()
+            TokenType.RETURN -> parseReturnStatement()
             else -> null
         }
+    }
+
+    // return <expression>;
+    private fun parseReturnStatement(): Statement {
+        // RETURN
+        val token = curToken
+        nextToken()
+        // todo skipping expression
+        while (!curTokenIs(TokenType.SEMICOLON)) {
+            nextToken()
+        }
+        return ReturnStatement(token, null)
     }
 
     // let <identifier> = <expression>;
