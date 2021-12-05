@@ -17,4 +17,8 @@ class Identifier(
     }
 
     override fun tokenLiteral() = token.literal
+
+    override fun toString(): String {
+        return value
+    }
 }

@@ -1,7 +1,12 @@
 package bekyiu.parser
 
+import bekyiu.ast.Identifier
 import bekyiu.ast.LetStatement
+import bekyiu.ast.Program
+import bekyiu.ast.Statement
 import bekyiu.lexer.Lexer
+import bekyiu.lexer.Token
+import bekyiu.lexer.TokenType
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -10,6 +15,23 @@ import org.junit.Test
  * @Created by bekyiu
  */
 class ParserTest {
+
+    @Test
+    fun testToString() {
+        val source = "let a = b;\n"
+        val statements = mutableListOf<Statement>()
+        val letStatement = LetStatement(
+            Token(TokenType.LET, "let"),
+            Identifier(Token(TokenType.IDENT, "a"), "a"),
+            Identifier(Token(TokenType.IDENT, "b"), "b"),
+        )
+
+        val program = Program(statements).apply {
+            this.statements.add(letStatement)
+        }
+        assert(program.toString() == source)
+    }
+
     @Test
     fun testLetStatements() {
         val code = """

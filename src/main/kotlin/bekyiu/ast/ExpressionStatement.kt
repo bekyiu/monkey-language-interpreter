@@ -3,15 +3,15 @@ package bekyiu.ast
 import bekyiu.lexer.Token
 
 /**
- * @Date 2021/12/4 1:24 下午
+ * @Date 2021/12/5 11:35 上午
  * @Created by bekyiu
  */
-class LetStatement(
-    // LET
+// it’s a statement that consists solely of one expression
+// we can push the expression to statements list
+class ExpressionStatement(
+    // the first token of the expression
     val token: Token,
-    // hold the identifier of the binding
-    val name: Identifier,
-    val value: Expression?,
+    val expression: Expression?,
 ) : Statement {
     override fun statementNode() {
         TODO("Not yet implemented")
@@ -20,6 +20,6 @@ class LetStatement(
     override fun tokenLiteral() = token.literal
 
     override fun toString(): String {
-        return "${tokenLiteral()} ${name.toString()} = ${value?.toString()};"
+        return expression?.toString() ?: ""
     }
 }
