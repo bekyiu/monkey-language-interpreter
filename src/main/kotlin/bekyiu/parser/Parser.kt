@@ -36,6 +36,7 @@ class Parser(
         infixParseFuns = mutableMapOf()
 
         registerPrefix(TokenType.IDENT, ::parseIdentifier)
+        registerPrefix(TokenType.INT, ::parseIntegerLiteral)
     }
 
     fun parseProgram(): Program {
@@ -90,6 +91,10 @@ class Parser(
 
     private fun parseIdentifier(): Expression {
         return Identifier(curToken, curToken.literal)
+    }
+
+    private fun parseIntegerLiteral(): Expression {
+        return IntegerLiteral(curToken, curToken.literal.toLong())
     }
 
     // return <expression>;
