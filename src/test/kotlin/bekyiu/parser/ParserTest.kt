@@ -1,13 +1,9 @@
 package bekyiu.parser
 
-import bekyiu.ast.Identifier
-import bekyiu.ast.LetStatement
-import bekyiu.ast.Program
-import bekyiu.ast.Statement
+import bekyiu.ast.*
 import bekyiu.lexer.Lexer
 import bekyiu.lexer.Token
 import bekyiu.lexer.TokenType
-import org.junit.Assert.*
 import org.junit.Test
 
 /**
@@ -15,6 +11,22 @@ import org.junit.Test
  * @Created by bekyiu
  */
 class ParserTest {
+
+    @Test
+    fun testIdentifierExpression() {
+        val source = "foobar;"
+        val lexer = Lexer(source)
+        val parser = Parser(lexer)
+        val program = parser.parseProgram()
+        assert(program.statements.size == 1)
+        assert(program.statements[0] is ExpressionStatement)
+
+        val expressionStatement = program.statements[0] as ExpressionStatement
+        val identifier = expressionStatement.expression as Identifier
+
+        assert(identifier.value == "foobar")
+        assert(identifier.tokenLiteral() == "foobar")
+    }
 
     @Test
     fun testToString() {

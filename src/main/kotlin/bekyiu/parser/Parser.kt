@@ -9,26 +9,39 @@ import bekyiu.lexer.TokenType
  * @Date 2021/12/4 1:39 下午
  * @Created by bekyiu
  */
+
+/*
+ prefixParseFun gets called when we encounter the associated token type in prefix position
+ infixParseFun gets called when we encounter the associated token type in infix position
+
+ start with curToken being the type of token you’re associated with
+ return with curToken being the last token that’s part of your expression type
+ won't advance the tokens too far
+ */
+typealias prefixParseFun = () -> Expression
+typealias infixParseFun = (Expression) -> Expression
+
 class Parser(
     val lexer: Lexer
 ) {
     var curToken: Token
     var peekToken: Token
+    var prefixParseFuns: MutableMap<TokenType, prefixParseFun>
+    var infixParseFuns: MutableMap<TokenType, infixParseFun>
 
     init {
         curToken = lexer.nextToken()
         peekToken = lexer.nextToken()
-    }
+        prefixParseFuns = mutableMapOf()
+        infixParseFuns = mutableMapOf()
 
-    private fun nextToken() {
-        curToken = peekToken
-        peekToken = lexer.nextToken()
+        registerPrefix(TokenType.IDENT, ::parseIdentifier)
     }
 
     fun parseProgram(): Program {
         val program = Program(mutableListOf())
         while (curToken.type != TokenType.EOF) {
-            parseStatement()?.let {
+            parseStatement().let {
                 program.statements.add(it)
             }
             nextToken()
@@ -36,12 +49,47 @@ class Parser(
         return program
     }
 
-    private fun parseStatement(): Statement? {
+    private fun registerPrefix(type: TokenType, fn: prefixParseFun) {
+        prefixParseFuns[type] = fn
+    }
+
+    private fun registerInfix(type: TokenType, fn: infixParseFun) {
+        infixParseFuns[type] = fn
+    }
+
+    private fun nextToken() {
+        curToken = peekToken
+        peekToken = lexer.nextToken()
+    }
+
+    private fun parseStatement(): Statement {
         return when (curToken.type) {
             TokenType.LET -> parseLetStatement()
             TokenType.RETURN -> parseReturnStatement()
-            else -> null
+            else -> parseExpressionStatement()
         }
+    }
+
+    private fun parseExpressionStatement(): Statement {
+        val stmt = ExpressionStatement(curToken, null)
+        stmt.expression = parseExpression(Precedence.LOWEST)
+        // optional semicolon make it easier to type in repl
+        if (peekTokenIs(TokenType.SEMICOLON)) {
+            nextToken()
+        }
+        return stmt
+    }
+
+    private fun parseExpression(precedence: Precedence): Expression? {
+        val prefixFn = prefixParseFuns[curToken.type]
+        return prefixFn?.let {
+            val leftExp = it()
+            leftExp
+        }
+    }
+
+    private fun parseIdentifier(): Expression {
+        return Identifier(curToken, curToken.literal)
     }
 
     // return <expression>;
@@ -93,3 +141,4 @@ class ParseException(expectedType: String, actualType: String, actualValue: Stri
     constructor(expected: TokenType, actual: Token) :
             this(expected.literal, actual.type.literal, actual.literal)
 }
+

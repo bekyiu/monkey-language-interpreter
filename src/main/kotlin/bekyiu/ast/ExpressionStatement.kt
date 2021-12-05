@@ -11,7 +11,7 @@ import bekyiu.lexer.Token
 class ExpressionStatement(
     // the first token of the expression
     val token: Token,
-    val expression: Expression?,
+    var expression: Expression?,
 ) : Statement {
     override fun statementNode() {
         TODO("Not yet implemented")
