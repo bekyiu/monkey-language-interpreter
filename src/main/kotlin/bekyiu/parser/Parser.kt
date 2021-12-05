@@ -37,6 +37,8 @@ class Parser(
 
         registerPrefix(TokenType.IDENT, ::parseIdentifier)
         registerPrefix(TokenType.INT, ::parseIntegerLiteral)
+        registerPrefix(TokenType.BANG, ::parsePrefixExpression)
+        registerPrefix(TokenType.MINUS, ::parsePrefixExpression)
     }
 
     fun parseProgram(): Program {
@@ -81,20 +83,30 @@ class Parser(
         return stmt
     }
 
-    private fun parseExpression(precedence: Precedence): Expression? {
+    private fun parseExpression(precedence: Precedence): Expression {
         val prefixFn = prefixParseFuns[curToken.type]
         return prefixFn?.let {
             val leftExp = it()
             leftExp
-        }
+        } ?: throw ParseException("no prefix parse function ${curToken.type.literal}(${curToken.literal}) found")
     }
 
+    // <identifier>;
     private fun parseIdentifier(): Expression {
         return Identifier(curToken, curToken.literal)
     }
 
+    // <integer literal>;
     private fun parseIntegerLiteral(): Expression {
         return IntegerLiteral(curToken, curToken.literal.toLong())
+    }
+
+    // <prefix operator><expression>;
+    private fun parsePrefixExpression(): Expression {
+        val token = curToken
+        nextToken()
+        val right = parseExpression(Precedence.PREFIX)
+        return PrefixExpression(token, token.literal, right)
     }
 
     // return <expression>;
@@ -140,10 +152,13 @@ class Parser(
     }
 }
 
-class ParseException(expectedType: String, actualType: String, actualValue: String) :
-    RuntimeException("parse error, expected: $expectedType, actually: $actualType($actualValue)") {
+class ParseException : RuntimeException {
 
-    constructor(expected: TokenType, actual: Token) :
-            this(expected.literal, actual.type.literal, actual.literal)
+    constructor(expected: TokenType, actual: Token) : super(
+        "parse error, expected: ${expected.literal}, " +
+                "actually: ${actual.type.literal}(${actual.literal})"
+    )
+
+    constructor(msg: String) : super("parse error: $msg")
 }
 

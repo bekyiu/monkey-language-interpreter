@@ -13,6 +13,31 @@ import org.junit.Test
 class ParserTest {
 
     @Test
+    fun testPrefixExpressions() {
+        class PrefixTest(val input: String, val operator: String, val integerValue: Long)
+
+        val cases = listOf(
+            PrefixTest("!5", "!", 5L),
+            PrefixTest("-7", "-", 7L),
+        )
+
+        for (case in cases) {
+            val lexer = Lexer(case.input)
+            val parser = Parser(lexer)
+            val program = parser.parseProgram()
+            assert(program.statements.size == 1)
+            assert(program.statements[0] is ExpressionStatement)
+            val expressionStatement = program.statements[0] as ExpressionStatement
+            val exp = expressionStatement.expression as PrefixExpression
+            assert(exp.operator == case.operator)
+
+            val right = exp.right as IntegerLiteral
+            assert(right.value == case.integerValue)
+        }
+
+    }
+
+    @Test
     fun testIntegerLiteralExpression() {
         val source = "7;"
         val lexer = Lexer(source)
