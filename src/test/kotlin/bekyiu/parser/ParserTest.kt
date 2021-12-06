@@ -19,9 +19,14 @@ class ParserTest {
             PrecedenceTest("-a * b", "((-a) * b)"),
             PrecedenceTest("!-a", "(!(-a))"),
             PrecedenceTest("a + b - c", "((a + b) - c)"),
+            PrecedenceTest("!false", "(!false)"),
+            PrecedenceTest("false != true", "(false != true)"),
+            PrecedenceTest("1 > 2 == false", "((1 > 2) == false)"),
             PrecedenceTest("a + b / c", "(a + (b / c))"),
             PrecedenceTest("a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"),
             PrecedenceTest("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),
+            PrecedenceTest("(1 + 2) * 3", "((1 + 2) * 3)"),
+            PrecedenceTest("-(1 + 2) * 3 / (7 + 7)", "(((-(1 + 2)) * 3) / (7 + 7))"),
         )
 
         for (case in cases) {

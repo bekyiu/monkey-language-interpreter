@@ -39,6 +39,9 @@ class Parser(
         registerPrefix(TokenType.INT, ::parseIntegerLiteral)
         registerPrefix(TokenType.BANG, ::parsePrefixExpression)
         registerPrefix(TokenType.MINUS, ::parsePrefixExpression)
+        registerPrefix(TokenType.TRUE, ::parseBool)
+        registerPrefix(TokenType.FALSE, ::parseBool)
+        registerPrefix(TokenType.LPAREN, ::parseGroupedExpression)
 
         registerInfix(TokenType.PLUS, ::parseInfixExpression)
         registerInfix(TokenType.MINUS, ::parseInfixExpression)
@@ -125,6 +128,23 @@ class Parser(
             leftExp = infixFn(leftExp)
         }
         return leftExp
+    }
+
+    // (<expression>);
+    private fun parseGroupedExpression(): Expression {
+        // e.g: (1 + 2) * 3
+        nextToken()
+        // 1 + 2) * 3
+        // it can be seen as ')' in place of the original '*' 's position
+        // and ')' is lower than '+', so '2' combine with '+'
+        val exp = parseExpression(Precedence.LOWEST)
+        expectPeek(TokenType.RPAREN)
+        return exp
+    }
+
+    // <true or false>;
+    private fun parseBool(): Expression {
+        return Bool(curToken, curToken.literal.toBoolean())
     }
 
     // <identifier>;
