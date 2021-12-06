@@ -3,12 +3,13 @@ package bekyiu.ast
 import bekyiu.lexer.Token
 
 /**
- * @Date 2021/12/5 5:44 下午
+ * @Date 2021/12/6 11:16 上午
  * @Created by bekyiu
  */
-class PrefixExpression(
-    // prefix token like ! or -
+class InfixExpression(
+    // the operator token like +
     val token: Token,
+    val left: Expression,
     val operator: String,
     val right: Expression,
 ) : Expression {
@@ -18,5 +19,5 @@ class PrefixExpression(
 
     override fun tokenLiteral() = token.literal
 
-    override fun toString() = "($operator$right)"
+    override fun toString() = "(${left} $operator ${right})"
 }

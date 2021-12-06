@@ -39,6 +39,29 @@ class Parser(
         registerPrefix(TokenType.INT, ::parseIntegerLiteral)
         registerPrefix(TokenType.BANG, ::parsePrefixExpression)
         registerPrefix(TokenType.MINUS, ::parsePrefixExpression)
+
+        registerInfix(TokenType.PLUS, ::parseInfixExpression)
+        registerInfix(TokenType.MINUS, ::parseInfixExpression)
+        registerInfix(TokenType.SLASH, ::parseInfixExpression)
+        registerInfix(TokenType.ASTERISK, ::parseInfixExpression)
+        registerInfix(TokenType.EQ, ::parseInfixExpression)
+        registerInfix(TokenType.NOT_EQ, ::parseInfixExpression)
+        registerInfix(TokenType.LT, ::parseInfixExpression)
+        registerInfix(TokenType.GT, ::parseInfixExpression)
+    }
+
+    companion object {
+        // this map associates token types with their precedence
+        val precedences = mapOf(
+            TokenType.EQ to Precedence.EQUALS,
+            TokenType.NOT_EQ to Precedence.EQUALS,
+            TokenType.LT to Precedence.LESS_GREATER,
+            TokenType.GT to Precedence.LESS_GREATER,
+            TokenType.PLUS to Precedence.SUM,
+            TokenType.MINUS to Precedence.SUM,
+            TokenType.SLASH to Precedence.PRODUCT,
+            TokenType.ASTERISK to Precedence.PRODUCT,
+        )
     }
 
     fun parseProgram(): Program {
@@ -85,10 +108,23 @@ class Parser(
 
     private fun parseExpression(precedence: Precedence): Expression {
         val prefixFn = prefixParseFuns[curToken.type]
-        return prefixFn?.let {
+        var leftExp = prefixFn?.let {
             val leftExp = it()
             leftExp
         } ?: throw ParseException("no prefix parse function ${curToken.type.literal}(${curToken.literal}) found")
+
+        // if peek token has higher precedence
+        // we need to make it deeper in ast
+        // it means current leftExp needs to precedent combine with the peek token
+        // otherwise the current leftExp needs to combine with the last token
+        // e.g: 1 + 2 * 3, '*' has higher precedence than '+'
+        // so '2' needs to precedent combine with '*' but not '+'
+        while (!peekTokenIs(TokenType.SEMICOLON) && precedence.lt(peekPrecedence())) {
+            val infixFn = infixParseFuns[peekToken.type] ?: return leftExp
+            nextToken()
+            leftExp = infixFn(leftExp)
+        }
+        return leftExp
     }
 
     // <identifier>;
@@ -107,6 +143,15 @@ class Parser(
         nextToken()
         val right = parseExpression(Precedence.PREFIX)
         return PrefixExpression(token, token.literal, right)
+    }
+
+    // <expression> <infix operator> <expression>
+    private fun parseInfixExpression(left: Expression): Expression {
+        val token = curToken
+        val precedence = curPrecedence()
+        nextToken()
+        val right = parseExpression(precedence)
+        return InfixExpression(token, left, token.literal, right)
     }
 
     // return <expression>;
@@ -149,6 +194,14 @@ class Parser(
 
     private fun curTokenIs(type: TokenType): Boolean {
         return curToken.type == type
+    }
+
+    private fun peekPrecedence(): Precedence {
+        return precedences[peekToken.type] ?: Precedence.LOWEST
+    }
+
+    private fun curPrecedence(): Precedence {
+        return precedences[curToken.type] ?: Precedence.LOWEST
     }
 }
 

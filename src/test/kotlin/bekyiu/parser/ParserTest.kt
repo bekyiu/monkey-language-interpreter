@@ -13,6 +13,56 @@ import org.junit.Test
 class ParserTest {
 
     @Test
+    fun testOperatorPrecedence() {
+        class PrecedenceTest(val input: String, val expected: String)
+        val cases = listOf(
+            PrecedenceTest("-a * b", "((-a) * b)"),
+            PrecedenceTest("!-a", "(!(-a))"),
+            PrecedenceTest("a + b - c", "((a + b) - c)"),
+            PrecedenceTest("a + b / c", "(a + (b / c))"),
+            PrecedenceTest("a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"),
+            PrecedenceTest("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),
+        )
+
+        for (case in cases) {
+            val lexer = Lexer(case.input)
+            val parser = Parser(lexer)
+            val program = parser.parseProgram()
+            println(program)
+            assert(case.expected == program.toString())
+        }
+    }
+
+    @Test
+    fun testInfixExpression() {
+        class InfixTest(val input: String, val left: Long, val op: String, val right: Long)
+
+        val cases = listOf(
+            InfixTest("5 + 5;", 5, "+", 5),
+            InfixTest("5 / 5;", 5, "/", 5),
+            InfixTest("5 > 5;", 5, ">", 5),
+            InfixTest("5 == 5;", 5, "==", 5),
+            InfixTest("5 != 5;", 5, "!=", 5),
+        )
+
+        for (case in cases) {
+            val lexer = Lexer(case.input)
+            val parser = Parser(lexer)
+            val program = parser.parseProgram()
+            assert(program.statements.size == 1)
+            assert(program.statements[0] is ExpressionStatement)
+
+            val expressionStatement = program.statements[0] as ExpressionStatement
+            val exp = expressionStatement.expression as InfixExpression
+            assert(exp.operator == case.op)
+            val left = exp.left as IntegerLiteral
+            assert(left.value == case.left)
+            val right = exp.right as IntegerLiteral
+            assert(right.value == case.right)
+        }
+    }
+
+    @Test
     fun testPrefixExpressions() {
         class PrefixTest(val input: String, val operator: String, val integerValue: Long)
 
@@ -71,7 +121,7 @@ class ParserTest {
 
     @Test
     fun testToString() {
-        val source = "let a = b;\n"
+        val source = "let a = b;"
         val statements = mutableListOf<Statement>()
         val letStatement = LetStatement(
             Token(TokenType.LET, "let"),

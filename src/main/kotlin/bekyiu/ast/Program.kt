@@ -22,7 +22,7 @@ class Program(
     override fun toString(): String {
         val str = StringBuilder(1024)
         for (s in statements) {
-            str.append(s.toString()).append("\n")
+            str.append(s.toString())
         }
         return str.toString()
     }
