@@ -13,8 +13,28 @@ import org.junit.Test
 class ParserTest {
 
     @Test
+    fun testIfExpression() {
+//        val source = "if (x < y) { x + 1; 10 }"
+        val source = "if (x < y) { x } else { y }"
+        val lexer = Lexer(source)
+        val parser = Parser(lexer)
+        val program = parser.parseProgram()
+        assert(program.statements.size == 1)
+        assert(program.statements[0] is ExpressionStatement)
+
+        val expressionStatement = program.statements[0] as ExpressionStatement
+        val ifExp = expressionStatement.expression as IfExpression
+        println(ifExp.condition)
+        println(ifExp.consequence)
+        ifExp.alternative?.let {
+            println(it)
+        }
+    }
+
+    @Test
     fun testOperatorPrecedence() {
         class PrecedenceTest(val input: String, val expected: String)
+
         val cases = listOf(
             PrecedenceTest("-a * b", "((-a) * b)"),
             PrecedenceTest("!-a", "(!(-a))"),

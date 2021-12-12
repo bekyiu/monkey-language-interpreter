@@ -42,6 +42,7 @@ class Parser(
         registerPrefix(TokenType.TRUE, ::parseBool)
         registerPrefix(TokenType.FALSE, ::parseBool)
         registerPrefix(TokenType.LPAREN, ::parseGroupedExpression)
+        registerPrefix(TokenType.IF, ::parseIfExpression)
 
         registerInfix(TokenType.PLUS, ::parseInfixExpression)
         registerInfix(TokenType.MINUS, ::parseInfixExpression)
@@ -70,9 +71,8 @@ class Parser(
     fun parseProgram(): Program {
         val program = Program(mutableListOf())
         while (curToken.type != TokenType.EOF) {
-            parseStatement().let {
-                program.statements.add(it)
-            }
+            val s = parseStatement()
+            program.statements.add(s)
             nextToken()
         }
         return program
@@ -128,6 +128,40 @@ class Parser(
             leftExp = infixFn(leftExp)
         }
         return leftExp
+    }
+
+    // {<statements>}
+    private fun parseBlockStatement(): BlockStatement {
+        // {
+        val token = curToken
+        nextToken()
+        val statements = mutableListOf<Statement>()
+        while (!curTokenIs(TokenType.RBRACE) && !curTokenIs(TokenType.EOF)) {
+            statements.add(parseStatement())
+            nextToken()
+        }
+        // current token is }
+        return BlockStatement(token, statements)
+    }
+
+    // if (<condition>) <consequence> else <alternative>
+    private fun parseIfExpression(): Expression {
+        // if
+        val token = curToken
+        expectPeek(TokenType.LPAREN)
+        nextToken()
+        val condition = parseExpression(Precedence.LOWEST)
+        expectPeek(TokenType.RPAREN)
+        expectPeek(TokenType.LBRACE)
+        val consequence = parseBlockStatement()
+        var alternative: BlockStatement? = null
+        // curToken is }
+        if (peekTokenIs(TokenType.ELSE)) {
+            nextToken()
+            expectPeek(TokenType.LBRACE)
+            alternative = parseBlockStatement()
+        }
+        return IfExpression(token, condition, consequence, alternative)
     }
 
     // (<expression>);
