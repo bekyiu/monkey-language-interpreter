@@ -43,6 +43,7 @@ class Parser(
         registerPrefix(TokenType.FALSE, ::parseBool)
         registerPrefix(TokenType.LPAREN, ::parseGroupedExpression)
         registerPrefix(TokenType.IF, ::parseIfExpression)
+        registerPrefix(TokenType.FUNCTION, ::parseFunctionLiteral)
 
         registerInfix(TokenType.PLUS, ::parseInfixExpression)
         registerInfix(TokenType.MINUS, ::parseInfixExpression)
@@ -128,6 +129,41 @@ class Parser(
             leftExp = infixFn(leftExp)
         }
         return leftExp
+    }
+
+    // fn <parameters> <block statement>
+    private fun parseFunctionLiteral(): Expression {
+        // fn
+        val token = curToken
+        expectPeek(TokenType.LPAREN)
+        val params = parseFunctionParameters()
+        expectPeek(TokenType.LBRACE)
+        val body = parseBlockStatement()
+        return FunctionLiteral(token, params, body)
+    }
+
+    // (ident1, ident2, ...)
+    // (ident1, ident2)
+    private fun parseFunctionParameters(): MutableList<Identifier> {
+        val params = mutableListOf<Identifier>()
+        if (peekTokenIs(TokenType.RPAREN)) {
+            nextToken()
+            return params
+        }
+        // skip (
+        nextToken()
+
+        var ident = Identifier(curToken, curToken.literal)
+        params.add(ident)
+
+        while (peekTokenIs(TokenType.COMMA)) {
+            nextToken()
+            nextToken()
+            ident = Identifier(curToken, curToken.literal)
+            params.add(ident)
+        }
+        expectPeek(TokenType.RPAREN)
+        return params
     }
 
     // {<statements>}

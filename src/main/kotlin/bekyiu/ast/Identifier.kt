@@ -12,10 +12,6 @@ class Identifier(
     val value: String
 ) : Expression {
 
-    override fun expressionNode() {
-        TODO("Not yet implemented")
-    }
-
     override fun tokenLiteral() = token.literal
 
     override fun toString(): String {

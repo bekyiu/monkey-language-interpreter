@@ -13,10 +13,6 @@ class ExpressionStatement(
     val token: Token,
     var expression: Expression?,
 ) : Statement {
-    override fun statementNode() {
-        TODO("Not yet implemented")
-    }
-
     override fun tokenLiteral() = token.literal
 
     override fun toString(): String {

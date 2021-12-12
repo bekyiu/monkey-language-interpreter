@@ -12,9 +12,6 @@ class PrefixExpression(
     val operator: String,
     val right: Expression,
 ) : Expression {
-    override fun expressionNode() {
-        TODO("Not yet implemented")
-    }
 
     override fun tokenLiteral() = token.literal
 

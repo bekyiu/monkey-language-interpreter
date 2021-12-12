@@ -11,10 +11,6 @@ class IntegerLiteral(
     val value: Long,
 ) : Expression {
 
-    override fun expressionNode() {
-        TODO("Not yet implemented")
-    }
-
     override fun tokenLiteral() = token.literal
 
     override fun toString() = token.literal

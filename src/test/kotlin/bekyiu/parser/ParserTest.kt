@@ -13,6 +13,22 @@ import org.junit.Test
 class ParserTest {
 
     @Test
+    fun testFunctionLiteral() {
+//        val source = "fn (x, y) { x + y; }"
+        val source = "fn (x) { x + y; }"
+//        val source = "fn () { x + y; }"
+        val lexer = Lexer(source)
+        val parser = Parser(lexer)
+        val program = parser.parseProgram()
+        assert(program.statements.size == 1)
+        assert(program.statements[0] is ExpressionStatement)
+
+        val expressionStatement = program.statements[0] as ExpressionStatement
+        val fn = expressionStatement.expression as FunctionLiteral
+        println(fn)
+    }
+
+    @Test
     fun testIfExpression() {
 //        val source = "if (x < y) { x + 1; 10 }"
         val source = "if (x < y) { x } else { y }"

@@ -10,9 +10,7 @@ interface Node {
 }
 
 interface Statement : Node {
-    fun statementNode()
 }
 
 interface Expression : Node {
-    fun expressionNode()
 }

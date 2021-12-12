@@ -14,7 +14,7 @@ class Lexer(
         // keyword map to it's token type
         private val keywords = mapOf(
             "let" to TokenType.LET,
-            "fun" to TokenType.FUNCTION,
+            "fn" to TokenType.FUNCTION,
             "true" to TokenType.TRUE,
             "false" to TokenType.FALSE,
             "if" to TokenType.IF,

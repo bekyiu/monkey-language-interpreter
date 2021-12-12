@@ -13,10 +13,6 @@ class InfixExpression(
     val operator: String,
     val right: Expression,
 ) : Expression {
-    override fun expressionNode() {
-        TODO("Not yet implemented")
-    }
-
     override fun tokenLiteral() = token.literal
 
     override fun toString() = "(${left} $operator ${right})"

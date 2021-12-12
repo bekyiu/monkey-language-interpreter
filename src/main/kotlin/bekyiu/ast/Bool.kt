@@ -10,10 +10,6 @@ class Bool(
     val token: Token,
     val value: Boolean,
 ) : Expression {
-    override fun expressionNode() {
-        TODO("Not yet implemented")
-    }
-
     override fun tokenLiteral() = token.literal
 
     override fun toString() = token.literal

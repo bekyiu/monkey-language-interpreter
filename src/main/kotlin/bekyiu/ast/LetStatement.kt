@@ -13,9 +13,6 @@ class LetStatement(
     val name: Identifier,
     val value: Expression?,
 ) : Statement {
-    override fun statementNode() {
-        TODO("Not yet implemented")
-    }
 
     override fun tokenLiteral() = token.literal
 
