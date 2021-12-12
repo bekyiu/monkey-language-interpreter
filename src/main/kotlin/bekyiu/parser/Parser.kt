@@ -53,6 +53,7 @@ class Parser(
         registerInfix(TokenType.NOT_EQ, ::parseInfixExpression)
         registerInfix(TokenType.LT, ::parseInfixExpression)
         registerInfix(TokenType.GT, ::parseInfixExpression)
+        registerInfix(TokenType.LPAREN, ::parseCallExpression)
     }
 
     companion object {
@@ -66,6 +67,7 @@ class Parser(
             TokenType.MINUS to Precedence.SUM,
             TokenType.SLASH to Precedence.PRODUCT,
             TokenType.ASTERISK to Precedence.PRODUCT,
+            TokenType.LPAREN to Precedence.CALL,
         )
     }
 
@@ -244,6 +246,37 @@ class Parser(
         return InfixExpression(token, left, token.literal, right)
     }
 
+    // <expression>(<expression, expression, ...>)
+    // ( has the highest precedence, so the function need to combine with (
+    private fun parseCallExpression(function: Expression): Expression {
+        // (
+        val token = curToken
+        val args = parseCallArguments()
+        return CallExpression(token, function, args)
+    }
+
+    // (<expression, expression, ...>)
+    private fun parseCallArguments(): MutableList<Expression> {
+        val args = mutableListOf<Expression>()
+        if (peekTokenIs(TokenType.RPAREN)) {
+            nextToken()
+            return args
+        }
+        // skip (
+        nextToken()
+
+        var exp = parseExpression(Precedence.LOWEST)
+        args.add(exp)
+        while (peekTokenIs(TokenType.COMMA)) {
+            nextToken()
+            nextToken()
+            exp = parseExpression(Precedence.LOWEST)
+            args.add(exp)
+        }
+        expectPeek(TokenType.RPAREN)
+        return args
+    }
+
     // return <expression>;
     private fun parseReturnStatement(): Statement {
         // RETURN
@@ -295,13 +328,4 @@ class Parser(
     }
 }
 
-class ParseException : RuntimeException {
-
-    constructor(expected: TokenType, actual: Token) : super(
-        "parse error, expected: ${expected.literal}, " +
-                "actually: ${actual.type.literal}(${actual.literal})"
-    )
-
-    constructor(msg: String) : super("parse error: $msg")
-}
 

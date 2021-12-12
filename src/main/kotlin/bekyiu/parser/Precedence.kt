@@ -23,7 +23,7 @@ enum class Precedence(val p: Int) {
     // -x or !x
     PREFIX(6),
 
-    // func(x)
+    // add(x)
     CALL(7),
     ;
 

@@ -13,6 +13,23 @@ import org.junit.Test
 class ParserTest {
 
     @Test
+    fun testCallExpression() {
+//        val source = "add(2 + 2);"
+//        val source = "add();"
+//        val source = "add(2);"
+        val source = "add(fn(x) {x + y}, 2 * 7);"
+        val lexer = Lexer(source)
+        val parser = Parser(lexer)
+        val program = parser.parseProgram()
+        assert(program.statements.size == 1)
+        assert(program.statements[0] is ExpressionStatement)
+
+        val expressionStatement = program.statements[0] as ExpressionStatement
+        val call = expressionStatement.expression as CallExpression
+        println(call)
+    }
+
+    @Test
     fun testFunctionLiteral() {
 //        val source = "fn (x, y) { x + y; }"
         val source = "fn (x) { x + y; }"
