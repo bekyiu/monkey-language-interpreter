@@ -225,7 +225,7 @@ class ParserTest {
         val code = """
             return 10;
             return 100;
-            return 1023423;
+            return add(1 + 2);
         """
         val lexer = Lexer(code)
         val parser = Parser(lexer)

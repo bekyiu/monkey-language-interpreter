@@ -282,11 +282,11 @@ class Parser(
         // RETURN
         val token = curToken
         nextToken()
-        // todo skipping expression
-        while (!curTokenIs(TokenType.SEMICOLON)) {
+        val value = parseExpression(Precedence.LOWEST)
+        if (peekTokenIs(TokenType.SEMICOLON)) {
             nextToken()
         }
-        return ReturnStatement(token, null)
+        return ReturnStatement(token, value)
     }
 
     // let <identifier> = <expression>;
@@ -296,11 +296,12 @@ class Parser(
         expectPeek(TokenType.IDENT)
         val ident = Identifier(curToken, curToken.literal)
         expectPeek(TokenType.ASSIGN)
-        // todo skipping expression
-        while (!curTokenIs(TokenType.SEMICOLON)) {
+        nextToken()
+        val value = parseExpression(Precedence.LOWEST)
+        if (peekTokenIs(TokenType.SEMICOLON)) {
             nextToken()
         }
-        return LetStatement(token, ident, null)
+        return LetStatement(token, ident, value)
     }
 
     private fun expectPeek(type: TokenType) {

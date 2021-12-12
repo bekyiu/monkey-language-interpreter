@@ -2,6 +2,8 @@ package bekyiu
 
 import bekyiu.lexer.Lexer
 import bekyiu.lexer.TokenType
+import bekyiu.parser.ParseException
+import bekyiu.parser.Parser
 import java.util.*
 
 /**
@@ -12,12 +14,19 @@ fun main() {
     repl()
 }
 
+const val MONKEY_HELLO = """
+███╗   ███╗  ██████╗  ███╗   ██╗ ██╗  ██╗ ███████╗ ██╗   ██╗
+████╗ ████║ ██╔═══██╗ ████╗  ██║ ██║ ██╔╝ ██╔════╝ ╚██╗ ██╔╝
+██╔████╔██║ ██║   ██║ ██╔██╗ ██║ █████╔╝  █████╗    ╚████╔╝ 
+██║╚██╔╝██║ ██║   ██║ ██║╚██╗██║ ██╔═██╗  ██╔══╝     ╚██╔╝  
+██║ ╚═╝ ██║ ╚██████╔╝ ██║ ╚████║ ██║  ██╗ ███████╗    ██║   
+>> Monkey Language Interpreter V0.1
+>> Press 'q' to exit
+>> """
 
 fun repl() {
     val sc = Scanner(System.`in`)
-    println(">> Monkey Language Interpreter V0.1")
-    println(">> Press 'q' to exit")
-    print(">> ")
+    print(MONKEY_HELLO)
     while (sc.hasNextLine()) {
         val input = sc.nextLine()
         if (input == "q") {
@@ -25,10 +34,14 @@ fun repl() {
         }
 
         val lexer = Lexer(input)
-        do {
-            val token = lexer.nextToken()
-            println(token)
-        } while (token.type != TokenType.EOF)
+        val parser = Parser(lexer)
+
+        try {
+            val program = parser.parseProgram()
+            println(program)
+        } catch (e: ParseException) {
+            println(e.message)
+        }
         print(">> ")
     }
 }

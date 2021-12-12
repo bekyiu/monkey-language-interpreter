@@ -11,12 +11,12 @@ class LetStatement(
     val token: Token,
     // hold the identifier of the binding
     val name: Identifier,
-    val value: Expression?,
+    val value: Expression,
 ) : Statement {
 
     override fun tokenLiteral() = token.literal
 
     override fun toString(): String {
-        return "${tokenLiteral()} ${name.toString()} = ${value?.toString()};"
+        return "${tokenLiteral()} ${name.toString()} = ${value.toString()};"
     }
 }

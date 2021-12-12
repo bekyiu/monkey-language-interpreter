@@ -8,11 +8,11 @@ import bekyiu.lexer.Token
  */
 class ReturnStatement(
     val token: Token,
-    val returnValue: Expression?,
+    val returnValue: Expression,
 ) : Statement {
     override fun tokenLiteral() = token.literal
 
     override fun toString(): String {
-        return "${tokenLiteral()} ${returnValue?.toString()};"
+        return "${tokenLiteral()} ${returnValue.toString()};"
     }
 }
