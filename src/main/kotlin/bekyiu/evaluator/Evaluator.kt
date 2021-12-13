@@ -1,5 +1,6 @@
 package bekyiu.evaluator
 
+import bekyiu.`object`.Boolean
 import bekyiu.`object`.Integer
 import bekyiu.`object`.Null
 import bekyiu.`object`.Object
@@ -16,6 +17,7 @@ class Evaluator {
             is Program -> evalStatements(node.statements)
             is ExpressionStatement -> eval(node.expression)
             is IntegerLiteral -> Integer(node.value)
+            is Bool -> Boolean.nativeToObject(node.value)
             else -> null
         }
         // println(v)

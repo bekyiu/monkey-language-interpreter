@@ -13,6 +13,28 @@ import org.junit.Test
  * @Created by bekyiu
  */
 class EvaluatorTest {
+
+    @Test
+    fun testEvalBooleanExpression() {
+        class Sample(val input: String, val expected: Boolean)
+
+        val cases = listOf(
+            Sample("true", true),
+            Sample("false", false),
+        )
+
+        for (case in cases) {
+            val value = testEval(case.input)
+            testBooleanObject(value, case.expected)
+        }
+    }
+
+    fun testBooleanObject(obj: Object, expected: Boolean) {
+        assert(obj is bekyiu.`object`.Boolean)
+        val bool = obj as bekyiu.`object`.Boolean
+        assert(bool.value == expected)
+    }
+
     @Test
     fun testEvalIntegerExpression() {
         class Sample(val input: String, val expected: Long)
@@ -33,7 +55,7 @@ class EvaluatorTest {
         val p = Parser(l)
         val program = p.parseProgram()
         val e = Evaluator()
-        return e.eval(program) ?: Null()
+        return e.eval(program) ?: Null.NULL
     }
 
     fun testIntegerObject(obj: Object, expected: Long) {
