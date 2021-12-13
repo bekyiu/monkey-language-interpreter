@@ -1,5 +1,6 @@
 package bekyiu
 
+import bekyiu.evaluator.Evaluator
 import bekyiu.lexer.Lexer
 import bekyiu.lexer.TokenType
 import bekyiu.parser.ParseException
@@ -35,10 +36,11 @@ fun repl() {
 
         val lexer = Lexer(input)
         val parser = Parser(lexer)
-
         try {
             val program = parser.parseProgram()
-            println(program)
+            val evaluator = Evaluator()
+            val result = evaluator.eval(program)
+            println(result)
         } catch (e: ParseException) {
             println(e.message)
         }

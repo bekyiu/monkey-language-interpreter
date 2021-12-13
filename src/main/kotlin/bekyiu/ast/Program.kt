@@ -1,7 +1,5 @@
 package bekyiu.ast
 
-import java.lang.StringBuilder
-
 /**
  * @Date 2021/12/4 12:41 下午
  * @Created by bekyiu
@@ -10,9 +8,9 @@ import java.lang.StringBuilder
 // every valid money program is a series of statements
 class Program(
     var statements: MutableList<Statement>
-) {
+) : Node {
 
-    fun tokenLiteral() =
+    override fun tokenLiteral() =
         if (statements.isNotEmpty()) {
             statements[0].tokenLiteral()
         } else {

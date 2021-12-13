@@ -11,11 +11,11 @@ import bekyiu.lexer.Token
 class ExpressionStatement(
     // the first token of the expression
     val token: Token,
-    var expression: Expression?,
+    var expression: Expression,
 ) : Statement {
     override fun tokenLiteral() = token.literal
 
     override fun toString(): String {
-        return expression?.toString() ?: ""
+        return expression.toString()
     }
 }

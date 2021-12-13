@@ -103,8 +103,9 @@ class Parser(
     }
 
     private fun parseExpressionStatement(): Statement {
-        val stmt = ExpressionStatement(curToken, null)
-        stmt.expression = parseExpression(Precedence.LOWEST)
+        val token = curToken
+        val exp = parseExpression(Precedence.LOWEST)
+        val stmt = ExpressionStatement(token, exp)
         // optional semicolon make it easier to type in repl
         if (peekTokenIs(TokenType.SEMICOLON)) {
             nextToken()

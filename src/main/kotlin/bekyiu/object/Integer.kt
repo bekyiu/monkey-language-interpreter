@@ -9,6 +9,9 @@ class Integer(
 ) : Object {
     override fun type() = ObjectType.INTEGER
 
-    override fun inspect() = value.toString()
+    override fun toString(): String {
+        return value.toString()
+    }
+//    override fun inspect() = value.toString()
 
 }

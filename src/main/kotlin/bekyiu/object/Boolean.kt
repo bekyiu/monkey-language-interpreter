@@ -9,5 +9,8 @@ import kotlin.Boolean
 class Boolean(var value: Boolean) : Object {
     override fun type() = ObjectType.BOOLEAN
 
-    override fun inspect() = value.toString()
+    override fun toString(): String {
+        return value.toString()
+    }
+//    override fun inspect() = value.toString()
 }

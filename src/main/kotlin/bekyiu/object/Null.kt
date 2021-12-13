@@ -7,5 +7,8 @@ package bekyiu.`object`
 class Null : Object {
     override fun type() = ObjectType.NULL
 
-    override fun inspect() = "null"
+    override fun toString(): String {
+        return "null"
+    }
+//    override fun inspect() = "null"
 }
