@@ -15,6 +15,24 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testBangOperator() {
+        class Sample(val input: String, val expected: Boolean)
+
+        val cases = listOf(
+            Sample("!true", false),
+            Sample("!false", true),
+            Sample("!!!false", true),
+            Sample("!5", false),
+            Sample("!!5", true),
+        )
+
+        for (case in cases) {
+            val value = testEval(case.input)
+            testBooleanObject(value, case.expected)
+        }
+    }
+
+    @Test
     fun testEvalBooleanExpression() {
         class Sample(val input: String, val expected: Boolean)
 
@@ -42,6 +60,7 @@ class EvaluatorTest {
         val cases = listOf(
             Sample("5", 5),
             Sample("77", 77),
+            Sample("-77", -77),
         )
 
         for (case in cases) {
