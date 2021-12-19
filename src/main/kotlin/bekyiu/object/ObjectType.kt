@@ -9,4 +9,5 @@ enum class ObjectType(val type: String) {
     BOOLEAN("BOOLEAN"),
     NULL("NULL"),
     RETURN_VALUE("RETURN_VALUE"),
+    ERROR("ERROR"),
 }

@@ -20,16 +20,27 @@ class Evaluator {
             is IfExpression -> evalIfExpression(node)
             is PrefixExpression -> {
                 val right = eval(node.right)
+                if (right is Error) {
+                    return right
+                }
                 evalPrefixExpression(node.operator, right!!)
             }
             is InfixExpression -> {
                 val left = eval(node.left)
+                if (left is Error) {
+                    return left
+                }
                 val right = eval(node.right)
-                return evalInfixExpression(node.operator, left!!, right!!)
+                if (right is Error) {
+                    return right
+                }
+                evalInfixExpression(node.operator, left!!, right!!)
             }
             is ReturnStatement -> {
-                val v = eval(node.returnValue)
-                ReturnValue(v!!)
+                when (val v = eval(node.returnValue)) {
+                    is Error -> return v
+                    else -> ReturnValue(v!!)
+                }
             }
             else -> null
         }
@@ -40,20 +51,15 @@ class Evaluator {
     private fun evalIfExpression(node: IfExpression): Object? {
         val cond = eval(node.condition)
         return when {
-            isTruthy(cond!!) -> {
-                eval(node.consequence)
-            }
-            node.alternative != null -> {
-                eval(node.alternative!!)
-            }
-            else -> {
-                null
-            }
+            cond is Error -> cond
+            isTruthy(cond!!) -> eval(node.consequence)
+            node.alternative != null -> eval(node.alternative!!)
+            else -> null
         }
     }
 
     private fun isTruthy(obj: Object): kotlin.Boolean {
-        return when(obj) {
+        return when (obj) {
             Null.NULL -> false
             Boolean.TRUE -> true
             Boolean.FALSE -> false
@@ -61,8 +67,9 @@ class Evaluator {
         }
     }
 
-    private fun evalInfixExpression(operator: String, left: Object, right: Object): Object? {
+    private fun evalInfixExpression(operator: String, left: Object, right: Object): Object {
         return when {
+            left.type() != right.type() -> Error("type mismatch: ${left.type()} $operator ${right.type()}")
             left.type() == ObjectType.INTEGER && right.type() == ObjectType.INTEGER -> evalIntegerInfixExpression(
                 operator,
                 left as Integer,
@@ -71,11 +78,11 @@ class Evaluator {
             // check equality between booleans
             operator == "==" -> Boolean.nativeToObject(left == right)
             operator == "!=" -> Boolean.nativeToObject(left != right)
-            else -> null
+            else -> Error("unknown operator: ${left.type()} $operator ${right.type()}")
         }
     }
 
-    private fun evalIntegerInfixExpression(operator: String, left: Integer, right: Integer): Object? {
+    private fun evalIntegerInfixExpression(operator: String, left: Integer, right: Integer): Object {
         return when (operator) {
             "+" -> Integer(left.value + right.value)
             "-" -> Integer(left.value - right.value)
@@ -85,23 +92,23 @@ class Evaluator {
             ">" -> Boolean.nativeToObject(left.value > right.value)
             "==" -> Boolean.nativeToObject(left.value == right.value)
             "!=" -> Boolean.nativeToObject(left.value != right.value)
-            else -> null
+            else -> Error("unknown operator: ${left.type()} $operator ${right.type()}")
         }
 
     }
 
-    private fun evalPrefixExpression(operator: String, right: Object): Object? {
+    private fun evalPrefixExpression(operator: String, right: Object): Object {
         return when (operator) {
             "!" -> evalBangOperatorExpression(right)
             "-" -> evalMinusPrefixOperatorExpression(right)
-            else -> null // throw error
+            else -> Error("unknown operator: ${operator}${right.type()}")
         }
     }
 
-    private fun evalMinusPrefixOperatorExpression(right: Object): Object? {
+    private fun evalMinusPrefixOperatorExpression(right: Object): Object {
         return when (right) {
             is Integer -> Integer(-right.value)
-            else -> null
+            else -> Error("unknown operator: -${right.type()}")
         }
     }
 
@@ -123,8 +130,8 @@ class Evaluator {
         var result: Object? = null
         for (stmt in stmts) {
             result = eval(stmt)
-            if (result is ReturnValue) {
-                // return ReturnValue itself
+            if ((result is ReturnValue) or (result is Error)) {
+                // return itself
                 return result
             }
         }
@@ -135,9 +142,9 @@ class Evaluator {
         var result: Object? = null
         for (stmt in stmts) {
             result = eval(stmt)
-            if (result is ReturnValue) {
-                // unwrap the ReturnValue
-                return result.value
+            when (result) {
+                is ReturnValue -> return result.value // unwrap the ReturnValue
+                is Error -> return result
             }
         }
         return result

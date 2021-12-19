@@ -1,5 +1,6 @@
 package bekyiu.evaluator
 
+import bekyiu.`object`.Error
 import bekyiu.`object`.Integer
 import bekyiu.`object`.Null
 import bekyiu.`object`.Object
@@ -15,6 +16,28 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testErrorHanding() {
+        class Sample(val input: String, val expected: String)
+
+        val cases = listOf(
+            Sample("5 + true;", "type mismatch: INTEGER + BOOLEAN"),
+            Sample("5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"),
+            Sample("-true;", "unknown operator: -BOOLEAN"),
+            Sample("""if (10 > 1) {
+                                if (10 > 1) {
+                                    return true + false;
+                                }
+                                return 1;
+                            }""", "unknown operator: BOOLEAN + BOOLEAN"),
+        )
+        for (case in cases) {
+            when (val value = testEval(case.input)) {
+                is Error -> assert(value.message == case.expected)
+            }
+        }
+    }
+
+    @Test
     fun testReturnStatement() {
         class Sample(val input: String, val expected: Any?)
 
@@ -22,12 +45,14 @@ class EvaluatorTest {
             Sample("return 1 + 1;", 2),
             Sample("return true;", true),
             Sample("1; return 10; 2;", 10),
-            Sample("""if (10 > 1) {
+            Sample(
+                """if (10 > 1) {
                                 if (10 > 1) {
                                     return 10;
                                 }
                                 return 1;
-                            }""", 10),
+                            }""", 10
+            ),
         )
 
         for (case in cases) {
