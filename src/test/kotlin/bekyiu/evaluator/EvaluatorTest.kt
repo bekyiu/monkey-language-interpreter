@@ -39,6 +39,12 @@ class EvaluatorTest {
         val cases = listOf(
             Sample("true", true),
             Sample("false", false),
+            Sample("1 > 2", false),
+            Sample("1 < 2", true),
+            Sample("1 == 2", false),
+            Sample("1 != 2", true),
+            Sample("(1 != 2) == true", true),
+            Sample("(1 < 2) != true", false),
         )
 
         for (case in cases) {
@@ -61,6 +67,10 @@ class EvaluatorTest {
             Sample("5", 5),
             Sample("77", 77),
             Sample("-77", -77),
+            Sample("1 + 1 - 5", -3),
+            Sample("-1 + 1 - 5", -5),
+            Sample("-1 + (1 - 5) * 3", -13),
+            Sample("(5 + 10 * 2 + 15 / 3) * 2 + -10", 50),
         )
 
         for (case in cases) {
