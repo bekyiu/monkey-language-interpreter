@@ -17,10 +17,17 @@ class EvaluatorTest {
     @Test
     fun testReturnStatement() {
         class Sample(val input: String, val expected: Any?)
+
         val cases = listOf(
             Sample("return 1 + 1;", 2),
             Sample("return true;", true),
             Sample("1; return 10; 2;", 10),
+            Sample("""if (10 > 1) {
+                                if (10 > 1) {
+                                    return 10;
+                                }
+                                return 1;
+                            }""", 10),
         )
 
         for (case in cases) {

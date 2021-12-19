@@ -12,11 +12,11 @@ class Evaluator {
 
     fun eval(node: Node): Object? {
         val v = when (node) {
-            is Program -> evalStatements(node.statements)
+            is Program -> evalProgram(node.statements)
             is ExpressionStatement -> eval(node.expression)
             is IntegerLiteral -> Integer(node.value)
             is Bool -> Boolean.nativeToObject(node.value)
-            is BlockStatement -> evalStatements(node.statements)
+            is BlockStatement -> evalBlockStatement(node.statements)
             is IfExpression -> evalIfExpression(node)
             is PrefixExpression -> {
                 val right = eval(node.right)
@@ -115,11 +115,28 @@ class Evaluator {
         }
     }
 
-    private fun evalStatements(stmts: MutableList<Statement>): Object? {
+    // if we have nested block statements
+    // we can’t unwrap the value of ReturnValue on first sight
+    // because we need to further keep track of it
+    // so we can stop the execution in the outermost block statement
+    private fun evalBlockStatement(stmts: MutableList<Statement>): Object? {
         var result: Object? = null
         for (stmt in stmts) {
             result = eval(stmt)
             if (result is ReturnValue) {
+                // return ReturnValue itself
+                return result
+            }
+        }
+        return result
+    }
+
+    private fun evalProgram(stmts: MutableList<Statement>): Object? {
+        var result: Object? = null
+        for (stmt in stmts) {
+            result = eval(stmt)
+            if (result is ReturnValue) {
+                // unwrap the ReturnValue
                 return result.value
             }
         }
