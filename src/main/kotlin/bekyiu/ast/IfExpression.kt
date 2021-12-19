@@ -24,7 +24,7 @@ class IfExpression(
             .append(consequence.toString())
 
         alternative?.let {
-            sb.append("else ")
+            sb.append(" else ")
                 .append(it.toString())
         }
 
