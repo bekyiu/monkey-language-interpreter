@@ -6,7 +6,6 @@ import bekyiu.`object`.Null
 import bekyiu.`object`.Object
 import bekyiu.lexer.Lexer
 import bekyiu.parser.Parser
-import org.junit.Assert.*
 import org.junit.Test
 
 /**
@@ -16,6 +15,22 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testLetStatement() {
+        class Sample(val input: String, val expected: Long)
+
+        val cases = listOf(
+            Sample("let a = 10; a;", 10),
+            Sample("let a = 2 * 5; a;", 10),
+            Sample("let a = 77; let b = 2; let c = a * b; c;", 154),
+            // Sample("let d = if (c > a) { 99 } else { 100 }; d;", 99),
+        )
+        for (case in cases) {
+            val v = testEval(case.input)
+            testIntegerObject(v, case.expected)
+        }
+    }
+
+    @Test
     fun testErrorHanding() {
         class Sample(val input: String, val expected: String)
 
@@ -23,12 +38,15 @@ class EvaluatorTest {
             Sample("5 + true;", "type mismatch: INTEGER + BOOLEAN"),
             Sample("5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"),
             Sample("-true;", "unknown operator: -BOOLEAN"),
-            Sample("""if (10 > 1) {
+            Sample(
+                """if (10 > 1) {
                                 if (10 > 1) {
                                     return true + false;
                                 }
                                 return 1;
-                            }""", "unknown operator: BOOLEAN + BOOLEAN"),
+                            }""", "unknown operator: BOOLEAN + BOOLEAN"
+            ),
+            Sample("foobar;", "identifier not found: foobar"),
         )
         for (case in cases) {
             when (val value = testEval(case.input)) {
@@ -162,7 +180,8 @@ class EvaluatorTest {
         val p = Parser(l)
         val program = p.parseProgram()
         val e = Evaluator()
-        return e.eval(program) ?: Null.NULL
+        val env = Environment()
+        return e.eval(program, env) ?: Null.NULL
     }
 
     fun testIntegerObject(obj: Object, expected: Long) {

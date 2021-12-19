@@ -10,37 +10,45 @@ import bekyiu.ast.*
  */
 class Evaluator {
 
-    fun eval(node: Node): Object? {
+    fun eval(node: Node, env: Environment): Object? {
         val v = when (node) {
-            is Program -> evalProgram(node.statements)
-            is ExpressionStatement -> eval(node.expression)
+            is Program -> evalProgram(node.statements, env)
+            is ExpressionStatement -> eval(node.expression, env)
             is IntegerLiteral -> Integer(node.value)
             is Bool -> Boolean.nativeToObject(node.value)
-            is BlockStatement -> evalBlockStatement(node.statements)
-            is IfExpression -> evalIfExpression(node)
+            is BlockStatement -> evalBlockStatement(node.statements, env)
+            is IfExpression -> evalIfExpression(node, env)
+            is Identifier -> evalIdentifier(node, env)
             is PrefixExpression -> {
-                val right = eval(node.right)
+                val right = eval(node.right, env)
                 if (right is Error) {
                     return right
                 }
                 evalPrefixExpression(node.operator, right!!)
             }
             is InfixExpression -> {
-                val left = eval(node.left)
+                val left = eval(node.left, env)
                 if (left is Error) {
                     return left
                 }
-                val right = eval(node.right)
+                val right = eval(node.right, env)
                 if (right is Error) {
                     return right
                 }
                 evalInfixExpression(node.operator, left!!, right!!)
             }
             is ReturnStatement -> {
-                when (val v = eval(node.returnValue)) {
+                when (val v = eval(node.returnValue, env)) {
                     is Error -> return v
                     else -> ReturnValue(v!!)
                 }
+            }
+            is LetStatement -> {
+                val v = eval(node.value, env)
+                if (v is Error) {
+                    return v
+                }
+                env.set(node.name.value, v!!)
             }
             else -> null
         }
@@ -48,12 +56,16 @@ class Evaluator {
         return v
     }
 
-    private fun evalIfExpression(node: IfExpression): Object? {
-        val cond = eval(node.condition)
+    private fun evalIdentifier(node: Identifier, env: Environment): Object {
+        return env.get(node.value) ?: Error("identifier not found: ${node.value}")
+    }
+
+    private fun evalIfExpression(node: IfExpression, env: Environment): Object? {
+        val cond = eval(node.condition, env)
         return when {
             cond is Error -> cond
-            isTruthy(cond!!) -> eval(node.consequence)
-            node.alternative != null -> eval(node.alternative!!)
+            isTruthy(cond!!) -> eval(node.consequence, env)
+            node.alternative != null -> eval(node.alternative!!, env)
             else -> null
         }
     }
@@ -126,10 +138,10 @@ class Evaluator {
     // we can’t unwrap the value of ReturnValue on first sight
     // because we need to further keep track of it
     // so we can stop the execution in the outermost block statement
-    private fun evalBlockStatement(stmts: MutableList<Statement>): Object? {
+    private fun evalBlockStatement(stmts: MutableList<Statement>, env: Environment): Object? {
         var result: Object? = null
         for (stmt in stmts) {
-            result = eval(stmt)
+            result = eval(stmt, env)
             if ((result is ReturnValue) or (result is Error)) {
                 // return itself
                 return result
@@ -138,10 +150,10 @@ class Evaluator {
         return result
     }
 
-    private fun evalProgram(stmts: MutableList<Statement>): Object? {
+    private fun evalProgram(stmts: MutableList<Statement>, env: Environment): Object? {
         var result: Object? = null
         for (stmt in stmts) {
-            result = eval(stmt)
+            result = eval(stmt, env)
             when (result) {
                 is ReturnValue -> return result.value // unwrap the ReturnValue
                 is Error -> return result
