@@ -15,6 +15,35 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testIfExpression() {
+        class Sample(val input: String, val expected: Any?)
+
+        val cases = listOf(
+            Sample("if (true) {10}", 10),
+            Sample("if (false) {10}", null),
+            Sample("if (1 < 2) {10} else {20}", 10),
+            Sample("if (1 > 2) {10} else {20}", 20),
+        )
+
+        for (case in cases) {
+            when (val value = testEval(case.input)) {
+                is Integer -> testIntegerObject(value, (case.expected as Int).toLong())
+                else -> testNullObject(value)
+            }
+        }
+
+    }
+
+    fun testNullObject(obj: Object): Boolean {
+        println("====")
+        if (obj != Null.NULL) {
+            System.err.println("obj不是null")
+            return false
+        }
+        return true
+    }
+
+    @Test
     fun testBangOperator() {
         class Sample(val input: String, val expected: Boolean)
 

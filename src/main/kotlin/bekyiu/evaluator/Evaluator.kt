@@ -16,6 +16,8 @@ class Evaluator {
             is ExpressionStatement -> eval(node.expression)
             is IntegerLiteral -> Integer(node.value)
             is Bool -> Boolean.nativeToObject(node.value)
+            is BlockStatement -> evalStatements(node.statements)
+            is IfExpression -> evalIfExpression(node)
             is PrefixExpression -> {
                 val right = eval(node.right)
                 evalPrefixExpression(node.operator, right!!)
@@ -29,6 +31,30 @@ class Evaluator {
         }
         // println(v)
         return v
+    }
+
+    private fun evalIfExpression(node: IfExpression): Object? {
+        val cond = eval(node.condition)
+        return when {
+            isTruthy(cond!!) -> {
+                eval(node.consequence)
+            }
+            node.alternative != null -> {
+                eval(node.alternative!!)
+            }
+            else -> {
+                null
+            }
+        }
+    }
+
+    private fun isTruthy(obj: Object): kotlin.Boolean {
+        return when(obj) {
+            Null.NULL -> false
+            Boolean.TRUE -> true
+            Boolean.FALSE -> false
+            else -> true
+        }
     }
 
     private fun evalInfixExpression(operator: String, left: Object, right: Object): Object? {
