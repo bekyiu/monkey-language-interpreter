@@ -1,6 +1,7 @@
 package bekyiu.evaluator
 
 import bekyiu.`object`.Error
+import bekyiu.`object`.Function
 import bekyiu.`object`.Integer
 import bekyiu.`object`.Null
 import bekyiu.`object`.Object
@@ -13,6 +14,44 @@ import org.junit.Test
  * @Created by bekyiu
  */
 class EvaluatorTest {
+
+    @Test
+    fun testClosure() {
+        val input = """
+            let newAdder = fn(x) {
+                fn(y) { x + y; };
+            };
+            let addTwo = newAdder(2);
+            addTwo(5);
+        """.trimIndent()
+        testIntegerObject(testEval(input), 7)
+    }
+
+    @Test
+    fun testFunctionApplication() {
+        class Sample(val input: String, val expected: Long)
+
+        val cases = listOf(
+            Sample("let identity = fn(x) { x; }; identity(5);", 5),
+            Sample("let identity = fn(x) { return x; }; identity(5);", 5),
+            Sample("let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20),
+            Sample("fn(x) { x; }(5);", 5),
+        )
+        for (case in cases) {
+            val v = testEval(case.input)
+            testIntegerObject(v, case.expected)
+        }
+    }
+
+    @Test
+    fun testFunctionObject() {
+        val input = "fn(x) {x+2;};"
+        var v = testEval(input)
+        assert(v is Function)
+        v = v as Function
+        assert(v.parameters.size == 1)
+        assert(v.body.toString() == "(x + 2)")
+    }
 
     @Test
     fun testLetStatement() {

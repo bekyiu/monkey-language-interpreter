@@ -7,7 +7,9 @@ import bekyiu.`object`.Object
  * @Created by bekyiu
  */
 class Environment(
-    val store: MutableMap<String, Object> = mutableMapOf()
+    val store: MutableMap<String, Object> = mutableMapOf(),
+    // The outer scope encloses the inner scope. And the inner scope extends the outer one
+    var outer: Environment? = null,
 ) {
     fun set(k: String, v: Object): Object {
         store[k] = v
@@ -15,6 +17,9 @@ class Environment(
     }
 
     fun get(k: String): Object? {
-        return store[k]
+        if (store.containsKey(k)) {
+            return store[k]
+        }
+        return outer?.get(k)
     }
 }

@@ -10,4 +10,5 @@ enum class ObjectType(val type: String) {
     NULL("NULL"),
     RETURN_VALUE("RETURN_VALUE"),
     ERROR("ERROR"),
+    FUNCTION("FUNCTION"),
 }

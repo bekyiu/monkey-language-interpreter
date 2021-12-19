@@ -2,6 +2,7 @@ package bekyiu.evaluator
 
 import bekyiu.`object`.*
 import bekyiu.`object`.Boolean
+import bekyiu.`object`.Function
 import bekyiu.ast.*
 
 /**
@@ -19,6 +20,7 @@ class Evaluator {
             is BlockStatement -> evalBlockStatement(node.statements, env)
             is IfExpression -> evalIfExpression(node, env)
             is Identifier -> evalIdentifier(node, env)
+            is FunctionLiteral -> Function(node.parameters, node.body, env)
             is PrefixExpression -> {
                 val right = eval(node.right, env)
                 if (right is Error) {
@@ -50,10 +52,53 @@ class Evaluator {
                 }
                 env.set(node.name.value, v!!)
             }
+            is CallExpression -> {
+                // object.Function
+                val func = eval(node.function, env)
+                if (func is Error) {
+                    return func
+                }
+                val args = evalExpressions(node.arguments, env)
+                if ((args.size == 1) and (args[0] is Error)) {
+                    return args[0]
+                }
+                applyFunction(func, args)
+            }
             else -> null
         }
         // println(v)
         return v
+    }
+
+    private fun applyFunction(func: Object?, args: MutableList<Object>): Object? {
+        if (func !is Function) {
+            return Error("not a function: ${func?.type()}")
+        }
+        val curEnv = Environment(outer = func.env)
+        func.parameters.forEachIndexed { idx, param ->
+            curEnv.set(param.value, args[idx])
+        }
+        val evaluated = eval(func.body, curEnv)
+        // unwrap the return value
+        if (evaluated is ReturnValue) {
+            return evaluated.value
+        }
+        // implicitly return
+        return evaluated
+    }
+
+    // process params
+    private fun evalExpressions(exps: MutableList<Expression>, env: Environment): MutableList<Object> {
+        val ret = mutableListOf<Object>()
+        for (exp in exps) {
+            val p = eval(exp, env)
+            if (p is Error) {
+                ret.add(p)
+                return ret
+            }
+            ret.add(p!!)
+        }
+        return ret
     }
 
     private fun evalIdentifier(node: Identifier, env: Environment): Object {
