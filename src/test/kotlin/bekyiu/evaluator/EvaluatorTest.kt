@@ -15,6 +15,23 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testReturnStatement() {
+        class Sample(val input: String, val expected: Any?)
+        val cases = listOf(
+            Sample("return 1 + 1;", 2),
+            Sample("return true;", true),
+            Sample("1; return 10; 2;", 10),
+        )
+
+        for (case in cases) {
+            when (val value = testEval(case.input)) {
+                is Integer -> testIntegerObject(value, (case.expected as Int).toLong())
+                is bekyiu.`object`.Boolean -> testBooleanObject(value, case.expected as Boolean)
+            }
+        }
+    }
+
+    @Test
     fun testIfExpression() {
         class Sample(val input: String, val expected: Any?)
 

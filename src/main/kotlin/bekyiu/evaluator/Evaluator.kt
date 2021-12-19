@@ -27,6 +27,10 @@ class Evaluator {
                 val right = eval(node.right)
                 return evalInfixExpression(node.operator, left!!, right!!)
             }
+            is ReturnStatement -> {
+                val v = eval(node.returnValue)
+                ReturnValue(v!!)
+            }
             else -> null
         }
         // println(v)
@@ -115,6 +119,9 @@ class Evaluator {
         var result: Object? = null
         for (stmt in stmts) {
             result = eval(stmt)
+            if (result is ReturnValue) {
+                return result.value
+            }
         }
         return result
     }

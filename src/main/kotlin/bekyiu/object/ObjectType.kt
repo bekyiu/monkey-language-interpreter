@@ -8,4 +8,5 @@ enum class ObjectType(val type: String) {
     INTEGER("INTEGER"),
     BOOLEAN("BOOLEAN"),
     NULL("NULL"),
+    RETURN_VALUE("RETURN_VALUE"),
 }
