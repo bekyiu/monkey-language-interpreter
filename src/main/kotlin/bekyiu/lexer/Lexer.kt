@@ -61,7 +61,7 @@ class Lexer(
             '/' -> Token(TokenType.SLASH, ch.toString())
             '<' -> Token(TokenType.LT, ch.toString())
             '>' -> Token(TokenType.GT, ch.toString())
-
+            '"' -> Token(TokenType.STRING, readString())
             '=' -> {
                 if (peekChar() == '=') {
                     readChar()
@@ -98,6 +98,16 @@ class Lexer(
         }
         readChar()
         return tok
+    }
+
+    private fun readString(): String {
+        var str = ""
+        readChar()
+        while (ch?.equals('"') == false) {
+            str += ch
+            readChar()
+        }
+        return str
     }
 
     private fun skipWhitespace() {

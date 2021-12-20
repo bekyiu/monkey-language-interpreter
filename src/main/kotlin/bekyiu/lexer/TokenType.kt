@@ -11,6 +11,7 @@ enum class TokenType(val literal: String) {
     // Identifiers + literals
     IDENT("IDENT"), // add, foobar, x, y, ...
     INT("INT"), // 1343456
+    STRING("STRING"), // "nanase"
 
     // Operators
     ASSIGN("="),

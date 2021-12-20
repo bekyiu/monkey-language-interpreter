@@ -16,6 +16,22 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testRecursive() {
+        val input = """
+            let counter = fn(x) {
+                if (x > 800) {
+                    return true;
+                } else {
+                    let foobar = 9999;
+                    counter(x + 1);
+                }
+            };
+            counter(0);
+            """
+        println(testEval(input))
+    }
+
+    @Test
     fun testClosure() {
         val input = """
             let newAdder = fn(x) {
