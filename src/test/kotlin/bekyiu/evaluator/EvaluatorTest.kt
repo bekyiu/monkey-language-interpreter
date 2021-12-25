@@ -12,6 +12,23 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testBuiltinFunctions() {
+        class Sample(val input: String, val expected: Long)
+
+        val cases = listOf(
+            Sample("len(\"\");", 0),
+            Sample("len(\"abc\");", 3),
+            Sample("len(\" a b \");", 5),
+            // error
+            // Sample("len(1);", -1),
+        )
+        for (case in cases) {
+            val v = testEval(case.input)
+            testIntegerObject(v, case.expected)
+        }
+    }
+
+    @Test
     fun testStringConcatenation() {
         val input = """
             "hello" + ", " + "world"

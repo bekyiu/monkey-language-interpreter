@@ -12,4 +12,5 @@ enum class _ObjectType(val type: String) {
     ERROR("ERROR"),
     FUNCTION("FUNCTION"),
     STRING("STRING"),
+    BUILTIN("BUILTIN"),
 }

@@ -1,8 +1,6 @@
 package bekyiu.evaluator
 
 import bekyiu.`object`.*
-import bekyiu.`object`._Boolean
-import bekyiu.`object`._Function
 import bekyiu.ast.*
 
 /**
@@ -72,20 +70,25 @@ class Evaluator {
     }
 
     private fun applyFunction(func: _Object?, args: MutableList<_Object>): _Object? {
-        if (func !is _Function) {
-            return _Error("not a function: ${func?.type()}")
+        return when (func) {
+            is _Function -> {
+                val curEnv = Environment(outer = func.env)
+                func.parameters.forEachIndexed { idx, param ->
+                    curEnv.set(param.value, args[idx])
+                }
+                val evaluated = eval(func.body, curEnv)
+                // unwrap the return value
+                if (evaluated is _ReturnValue) {
+                    evaluated.value
+                } else {
+                    // implicitly return
+                    evaluated
+                }
+            }
+            is _Builtin -> func.fn(args)
+            else -> _Error("not a function: ${func?.type()}")
         }
-        val curEnv = Environment(outer = func.env)
-        func.parameters.forEachIndexed { idx, param ->
-            curEnv.set(param.value, args[idx])
-        }
-        val evaluated = eval(func.body, curEnv)
-        // unwrap the return value
-        if (evaluated is _ReturnValue) {
-            return evaluated.value
-        }
-        // implicitly return
-        return evaluated
+
     }
 
     // process params
@@ -103,7 +106,7 @@ class Evaluator {
     }
 
     private fun evalIdentifier(node: Identifier, env: Environment): _Object {
-        return env.get(node.value) ?: _Error("identifier not found: ${node.value}")
+        return env.get(node.value) ?: builtins[node.value] ?: _Error("identifier not found: ${node.value}")
     }
 
     private fun evalIfExpression(node: IfExpression, env: Environment): _Object? {
