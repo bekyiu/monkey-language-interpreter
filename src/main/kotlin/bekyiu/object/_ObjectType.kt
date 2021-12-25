@@ -11,4 +11,5 @@ enum class _ObjectType(val type: String) {
     RETURN_VALUE("RETURN_VALUE"),
     ERROR("ERROR"),
     FUNCTION("FUNCTION"),
+    STRING("STRING"),
 }

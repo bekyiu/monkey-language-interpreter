@@ -20,6 +20,7 @@ class Evaluator {
             is BlockStatement -> evalBlockStatement(node.statements, env)
             is IfExpression -> evalIfExpression(node, env)
             is Identifier -> evalIdentifier(node, env)
+            is StringLiteral -> _String(node.value)
             is FunctionLiteral -> _Function(node.parameters, node.body, env)
             is PrefixExpression -> {
                 val right = eval(node.right, env)
@@ -132,11 +133,23 @@ class Evaluator {
                 left as _Integer,
                 right as _Integer,
             )
+            left.type() == _ObjectType.STRING && right.type() == _ObjectType.STRING -> evalStringInfixExpression(
+                operator,
+                left as _String,
+                right as _String,
+            )
             // check equality between booleans
             operator == "==" -> _Boolean.nativeToObject(left == right)
             operator == "!=" -> _Boolean.nativeToObject(left != right)
             else -> _Error("unknown operator: ${left.type()} $operator ${right.type()}")
         }
+    }
+
+    private fun evalStringInfixExpression(operator: String, left: _String, right: _String): _Object {
+        if (operator != "+") {
+            return _Error("unknown operator: ${left.type()} $operator ${right.type()}")
+        }
+        return _String(left.value + right.value)
     }
 
     private fun evalIntegerInfixExpression(operator: String, left: _Integer, right: _Integer): _Object {

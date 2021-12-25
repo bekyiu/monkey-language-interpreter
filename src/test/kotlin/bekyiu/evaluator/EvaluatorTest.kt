@@ -12,6 +12,28 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testStringConcatenation() {
+        val input = """
+            "hello" + ", " + "world"
+        """.trimIndent()
+
+        var evaluated = testEval(input)
+        evaluated = evaluated as _String
+        assert(evaluated.value == "hello, world")
+    }
+
+    @Test
+    fun testString() {
+        val input = """
+            "hello world"
+        """.trimIndent()
+
+        var evaluated = testEval(input)
+        evaluated = evaluated as _String
+        assert(evaluated.value == "hello world")
+    }
+
+    @Test
     fun testRecursive() {
         val input = """
             let counter = fn(x) {

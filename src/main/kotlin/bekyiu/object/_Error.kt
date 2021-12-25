@@ -9,4 +9,5 @@ class _Error(
     val message: String
 ) : _Object {
     override fun type() = _ObjectType.ERROR
+    override fun toString() = message
 }
