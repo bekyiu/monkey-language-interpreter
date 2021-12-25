@@ -4,13 +4,13 @@ package bekyiu.`object`
  * @Date 2021/12/12 8:58 下午
  * @Created by bekyiu
  */
-class Null private constructor() : Object {
+class _Null private constructor() : _Object {
 
     companion object {
-        val NULL = Null()
+        val NULL = _Null()
     }
 
-    override fun type() = ObjectType.NULL
+    override fun type() = _ObjectType.NULL
 
     override fun toString(): String {
         return "null"

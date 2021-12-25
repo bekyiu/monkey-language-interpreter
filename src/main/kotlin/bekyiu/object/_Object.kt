@@ -5,7 +5,7 @@ package bekyiu.`object`
  * @Created by bekyiu
  */
 // all values in Monkey source code will implement this interface
-interface Object {
-    fun type(): ObjectType
+interface _Object {
+    fun type(): _ObjectType
     // fun inspect(): String
 }

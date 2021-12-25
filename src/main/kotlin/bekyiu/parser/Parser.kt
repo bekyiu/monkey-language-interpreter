@@ -44,6 +44,7 @@ class Parser(
         registerPrefix(TokenType.LPAREN, ::parseGroupedExpression)
         registerPrefix(TokenType.IF, ::parseIfExpression)
         registerPrefix(TokenType.FUNCTION, ::parseFunctionLiteral)
+        registerPrefix(TokenType.STRING, ::parseStringLiteral)
 
         registerInfix(TokenType.PLUS, ::parseInfixExpression)
         registerInfix(TokenType.MINUS, ::parseInfixExpression)
@@ -218,6 +219,11 @@ class Parser(
     // <true or false>;
     private fun parseBool(): Expression {
         return Bool(curToken, curToken.literal.toBoolean())
+    }
+
+    // <string literal>;
+    private fun parseStringLiteral(): Expression {
+        return StringLiteral(curToken, curToken.literal)
     }
 
     // <identifier>;

@@ -1,10 +1,6 @@
 package bekyiu.evaluator
 
-import bekyiu.`object`.Error
-import bekyiu.`object`.Function
-import bekyiu.`object`.Integer
-import bekyiu.`object`.Null
-import bekyiu.`object`.Object
+import bekyiu.`object`.*
 import bekyiu.lexer.Lexer
 import bekyiu.parser.Parser
 import org.junit.Test
@@ -63,8 +59,8 @@ class EvaluatorTest {
     fun testFunctionObject() {
         val input = "fn(x) {x+2;};"
         var v = testEval(input)
-        assert(v is Function)
-        v = v as Function
+        assert(v is _Function)
+        v = v as _Function
         assert(v.parameters.size == 1)
         assert(v.body.toString() == "(x + 2)")
     }
@@ -130,8 +126,8 @@ class EvaluatorTest {
 
         for (case in cases) {
             when (val value = testEval(case.input)) {
-                is Integer -> testIntegerObject(value, (case.expected as Int).toLong())
-                is bekyiu.`object`.Boolean -> testBooleanObject(value, case.expected as Boolean)
+                is _Integer -> testIntegerObject(value, (case.expected as Int).toLong())
+                is _Boolean -> testBooleanObject(value, case.expected as Boolean)
             }
         }
     }
@@ -149,16 +145,16 @@ class EvaluatorTest {
 
         for (case in cases) {
             when (val value = testEval(case.input)) {
-                is Integer -> testIntegerObject(value, (case.expected as Int).toLong())
+                is _Integer -> testIntegerObject(value, (case.expected as Int).toLong())
                 else -> testNullObject(value)
             }
         }
 
     }
 
-    fun testNullObject(obj: Object): Boolean {
+    fun testNullObject(obj: _Object): Boolean {
         println("====")
-        if (obj != Null.NULL) {
+        if (obj != _Null.NULL) {
             System.err.println("obj不是null")
             return false
         }
@@ -204,9 +200,9 @@ class EvaluatorTest {
         }
     }
 
-    fun testBooleanObject(obj: Object, expected: Boolean) {
-        assert(obj is bekyiu.`object`.Boolean)
-        val bool = obj as bekyiu.`object`.Boolean
+    fun testBooleanObject(obj: _Object, expected: Boolean) {
+        assert(obj is bekyiu.`object`._Boolean)
+        val bool = obj as bekyiu.`object`._Boolean
         assert(bool.value == expected)
     }
 
@@ -230,18 +226,18 @@ class EvaluatorTest {
         }
     }
 
-    fun testEval(input: String): Object {
+    fun testEval(input: String): _Object {
         val l = Lexer(input)
         val p = Parser(l)
         val program = p.parseProgram()
         val e = Evaluator()
         val env = Environment()
-        return e.eval(program, env) ?: Null.NULL
+        return e.eval(program, env) ?: _Null.NULL
     }
 
-    fun testIntegerObject(obj: Object, expected: Long) {
-        assert(obj is Integer)
-        val int = obj as Integer
+    fun testIntegerObject(obj: _Object, expected: Long) {
+        assert(obj is _Integer)
+        val int = obj as _Integer
         assert(int.value == expected)
     }
 }

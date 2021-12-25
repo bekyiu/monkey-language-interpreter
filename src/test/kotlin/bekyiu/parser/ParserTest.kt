@@ -13,6 +13,23 @@ import org.junit.Test
 class ParserTest {
 
     @Test
+    fun testStringLiteral() {
+        val source = """
+            "hello, world";
+        """.trimIndent()
+        val lexer = Lexer(source)
+        val parser = Parser(lexer)
+        val program = parser.parseProgram()
+        assert(program.statements.size == 1)
+        assert(program.statements[0] is ExpressionStatement)
+
+        val expressionStatement = program.statements[0] as ExpressionStatement
+        val str = expressionStatement.expression as StringLiteral
+        assert(str.tokenLiteral() == "hello, world")
+        println(str)
+    }
+
+    @Test
     fun testCallExpression() {
 //        val source = "add(2 + 2);"
 //        val source = "add();"

@@ -5,8 +5,8 @@ package bekyiu.`object`
  * @Created by bekyiu
  */
 
-class Error(
+class _Error(
     val message: String
-) : Object {
-    override fun type() = ObjectType.ERROR
+) : _Object {
+    override fun type() = _ObjectType.ERROR
 }

@@ -9,13 +9,13 @@ import java.lang.StringBuilder
  * @Date 2021/12/19 7:47 下午
  * @Created by bekyiu
  */
-class Function(
+class _Function(
     val parameters: MutableList<Identifier>,
     val body: BlockStatement,
     // the environment where the function is located, not the environment where the function is used
     val env: Environment,
-) : Object {
-    override fun type() = ObjectType.FUNCTION
+) : _Object {
+    override fun type() = _ObjectType.FUNCTION
 
     override fun toString(): String {
         val params = mutableListOf<String>()

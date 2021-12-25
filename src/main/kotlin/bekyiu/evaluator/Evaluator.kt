@@ -1,8 +1,8 @@
 package bekyiu.evaluator
 
 import bekyiu.`object`.*
-import bekyiu.`object`.Boolean
-import bekyiu.`object`.Function
+import bekyiu.`object`._Boolean
+import bekyiu.`object`._Function
 import bekyiu.ast.*
 
 /**
@@ -11,55 +11,55 @@ import bekyiu.ast.*
  */
 class Evaluator {
 
-    fun eval(node: Node, env: Environment): Object? {
+    fun eval(node: Node, env: Environment): _Object? {
         val v = when (node) {
             is Program -> evalProgram(node.statements, env)
             is ExpressionStatement -> eval(node.expression, env)
-            is IntegerLiteral -> Integer(node.value)
-            is Bool -> Boolean.nativeToObject(node.value)
+            is IntegerLiteral -> _Integer(node.value)
+            is Bool -> _Boolean.nativeToObject(node.value)
             is BlockStatement -> evalBlockStatement(node.statements, env)
             is IfExpression -> evalIfExpression(node, env)
             is Identifier -> evalIdentifier(node, env)
-            is FunctionLiteral -> Function(node.parameters, node.body, env)
+            is FunctionLiteral -> _Function(node.parameters, node.body, env)
             is PrefixExpression -> {
                 val right = eval(node.right, env)
-                if (right is Error) {
+                if (right is _Error) {
                     return right
                 }
                 evalPrefixExpression(node.operator, right!!)
             }
             is InfixExpression -> {
                 val left = eval(node.left, env)
-                if (left is Error) {
+                if (left is _Error) {
                     return left
                 }
                 val right = eval(node.right, env)
-                if (right is Error) {
+                if (right is _Error) {
                     return right
                 }
                 evalInfixExpression(node.operator, left!!, right!!)
             }
             is ReturnStatement -> {
                 when (val v = eval(node.returnValue, env)) {
-                    is Error -> return v
-                    else -> ReturnValue(v!!)
+                    is _Error -> return v
+                    else -> _ReturnValue(v!!)
                 }
             }
             is LetStatement -> {
                 val v = eval(node.value, env)
-                if (v is Error) {
+                if (v is _Error) {
                     return v
                 }
                 env.set(node.name.value, v!!)
             }
             is CallExpression -> {
-                // object.Function
+                // object._Function
                 val func = eval(node.function, env)
-                if (func is Error) {
+                if (func is _Error) {
                     return func
                 }
                 val args = evalExpressions(node.arguments, env)
-                if ((args.size == 1) and (args[0] is Error)) {
+                if ((args.size == 1) and (args[0] is _Error)) {
                     return args[0]
                 }
                 applyFunction(func, args)
@@ -70,9 +70,9 @@ class Evaluator {
         return v
     }
 
-    private fun applyFunction(func: Object?, args: MutableList<Object>): Object? {
-        if (func !is Function) {
-            return Error("not a function: ${func?.type()}")
+    private fun applyFunction(func: _Object?, args: MutableList<_Object>): _Object? {
+        if (func !is _Function) {
+            return _Error("not a function: ${func?.type()}")
         }
         val curEnv = Environment(outer = func.env)
         func.parameters.forEachIndexed { idx, param ->
@@ -80,7 +80,7 @@ class Evaluator {
         }
         val evaluated = eval(func.body, curEnv)
         // unwrap the return value
-        if (evaluated is ReturnValue) {
+        if (evaluated is _ReturnValue) {
             return evaluated.value
         }
         // implicitly return
@@ -88,11 +88,11 @@ class Evaluator {
     }
 
     // process params
-    private fun evalExpressions(exps: MutableList<Expression>, env: Environment): MutableList<Object> {
-        val ret = mutableListOf<Object>()
+    private fun evalExpressions(exps: MutableList<Expression>, env: Environment): MutableList<_Object> {
+        val ret = mutableListOf<_Object>()
         for (exp in exps) {
             val p = eval(exp, env)
-            if (p is Error) {
+            if (p is _Error) {
                 ret.add(p)
                 return ret
             }
@@ -101,93 +101,93 @@ class Evaluator {
         return ret
     }
 
-    private fun evalIdentifier(node: Identifier, env: Environment): Object {
-        return env.get(node.value) ?: Error("identifier not found: ${node.value}")
+    private fun evalIdentifier(node: Identifier, env: Environment): _Object {
+        return env.get(node.value) ?: _Error("identifier not found: ${node.value}")
     }
 
-    private fun evalIfExpression(node: IfExpression, env: Environment): Object? {
+    private fun evalIfExpression(node: IfExpression, env: Environment): _Object? {
         val cond = eval(node.condition, env)
         return when {
-            cond is Error -> cond
+            cond is _Error -> cond
             isTruthy(cond!!) -> eval(node.consequence, env)
             node.alternative != null -> eval(node.alternative!!, env)
             else -> null
         }
     }
 
-    private fun isTruthy(obj: Object): kotlin.Boolean {
+    private fun isTruthy(obj: _Object): Boolean {
         return when (obj) {
-            Null.NULL -> false
-            Boolean.TRUE -> true
-            Boolean.FALSE -> false
+            _Null.NULL -> false
+            _Boolean.TRUE -> true
+            _Boolean.FALSE -> false
             else -> true
         }
     }
 
-    private fun evalInfixExpression(operator: String, left: Object, right: Object): Object {
+    private fun evalInfixExpression(operator: String, left: _Object, right: _Object): _Object {
         return when {
-            left.type() != right.type() -> Error("type mismatch: ${left.type()} $operator ${right.type()}")
-            left.type() == ObjectType.INTEGER && right.type() == ObjectType.INTEGER -> evalIntegerInfixExpression(
+            left.type() != right.type() -> _Error("type mismatch: ${left.type()} $operator ${right.type()}")
+            left.type() == _ObjectType.INTEGER && right.type() == _ObjectType.INTEGER -> evalIntegerInfixExpression(
                 operator,
-                left as Integer,
-                right as Integer,
+                left as _Integer,
+                right as _Integer,
             )
             // check equality between booleans
-            operator == "==" -> Boolean.nativeToObject(left == right)
-            operator == "!=" -> Boolean.nativeToObject(left != right)
-            else -> Error("unknown operator: ${left.type()} $operator ${right.type()}")
+            operator == "==" -> _Boolean.nativeToObject(left == right)
+            operator == "!=" -> _Boolean.nativeToObject(left != right)
+            else -> _Error("unknown operator: ${left.type()} $operator ${right.type()}")
         }
     }
 
-    private fun evalIntegerInfixExpression(operator: String, left: Integer, right: Integer): Object {
+    private fun evalIntegerInfixExpression(operator: String, left: _Integer, right: _Integer): _Object {
         return when (operator) {
-            "+" -> Integer(left.value + right.value)
-            "-" -> Integer(left.value - right.value)
-            "*" -> Integer(left.value * right.value)
-            "/" -> Integer(left.value / right.value)
-            "<" -> Boolean.nativeToObject(left.value < right.value)
-            ">" -> Boolean.nativeToObject(left.value > right.value)
-            "==" -> Boolean.nativeToObject(left.value == right.value)
-            "!=" -> Boolean.nativeToObject(left.value != right.value)
-            else -> Error("unknown operator: ${left.type()} $operator ${right.type()}")
+            "+" -> _Integer(left.value + right.value)
+            "-" -> _Integer(left.value - right.value)
+            "*" -> _Integer(left.value * right.value)
+            "/" -> _Integer(left.value / right.value)
+            "<" -> _Boolean.nativeToObject(left.value < right.value)
+            ">" -> _Boolean.nativeToObject(left.value > right.value)
+            "==" -> _Boolean.nativeToObject(left.value == right.value)
+            "!=" -> _Boolean.nativeToObject(left.value != right.value)
+            else -> _Error("unknown operator: ${left.type()} $operator ${right.type()}")
         }
 
     }
 
-    private fun evalPrefixExpression(operator: String, right: Object): Object {
+    private fun evalPrefixExpression(operator: String, right: _Object): _Object {
         return when (operator) {
             "!" -> evalBangOperatorExpression(right)
             "-" -> evalMinusPrefixOperatorExpression(right)
-            else -> Error("unknown operator: ${operator}${right.type()}")
+            else -> _Error("unknown operator: ${operator}${right.type()}")
         }
     }
 
-    private fun evalMinusPrefixOperatorExpression(right: Object): Object {
+    private fun evalMinusPrefixOperatorExpression(right: _Object): _Object {
         return when (right) {
-            is Integer -> Integer(-right.value)
-            else -> Error("unknown operator: -${right.type()}")
+            is _Integer -> _Integer(-right.value)
+            else -> _Error("unknown operator: -${right.type()}")
         }
     }
 
     // the behaviour of the ! is specified
-    private fun evalBangOperatorExpression(right: Object): Object {
+    private fun evalBangOperatorExpression(right: _Object): _Object {
         return when (right) {
-            Boolean.TRUE -> Boolean.FALSE
-            Boolean.FALSE -> Boolean.TRUE
-            Null.NULL -> Boolean.TRUE
-            else -> Boolean.FALSE
+            _Boolean.TRUE -> _Boolean.FALSE
+            _Boolean.FALSE -> _Boolean.TRUE
+            _Null.NULL -> _Boolean.TRUE
+            else -> _Boolean.FALSE
         }
     }
 
     // if we have nested block statements
-    // we can’t unwrap the value of ReturnValue on first sight
+    // we can’t unwrap the value of _ReturnValue on first sight
     // because we need to further keep track of it
     // so we can stop the execution in the outermost block statement
-    private fun evalBlockStatement(stmts: MutableList<Statement>, env: Environment): Object? {
-        var result: Object? = null
+    private fun evalBlockStatement(stmts: MutableList<Statement>, env: Environment): _Object? {
+        var result: _Object? = null
         for (stmt in stmts) {
             result = eval(stmt, env)
-            if ((result is ReturnValue) or (result is Error)) {
+            if ((result is _ReturnValue) or (result is _Error)) {
                 // return itself
                 return result
             }
@@ -195,13 +195,13 @@ class Evaluator {
         return result
     }
 
-    private fun evalProgram(stmts: MutableList<Statement>, env: Environment): Object? {
-        var result: Object? = null
+    private fun evalProgram(stmts: MutableList<Statement>, env: Environment): _Object? {
+        var result: _Object? = null
         for (stmt in stmts) {
             result = eval(stmt, env)
             when (result) {
-                is ReturnValue -> return result.value // unwrap the ReturnValue
-                is Error -> return result
+                is _ReturnValue -> return result.value // unwrap the _ReturnValue
+                is _Error -> return result
             }
         }
         return result
