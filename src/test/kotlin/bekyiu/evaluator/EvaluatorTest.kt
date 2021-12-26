@@ -56,6 +56,9 @@ class EvaluatorTest {
             Sample("len(\" a b \");", 5),
             // error
             // Sample("len(1);", -1),
+            Sample("let a = [1, 2, 3]; len(a);", 3),
+            Sample("let a = []; len(a);", 0),
+            Sample("let a = [999, 6]; first(a);", 999),
         )
         for (case in cases) {
             val v = testEval(case.input)

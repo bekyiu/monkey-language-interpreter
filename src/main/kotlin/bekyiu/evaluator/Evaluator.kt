@@ -58,14 +58,14 @@ class Evaluator {
                     return func
                 }
                 val args = evalExpressions(node.arguments, env)
-                if ((args.size == 1) and (args[0] is _Error)) {
+                if (args.size == 1 && args[0] is _Error) {
                     return args[0]
                 }
                 applyFunction(func, args)
             }
             is ArrayLiteral -> {
                 val elements = evalExpressions(node.elements, env)
-                if ((elements.size == 1) and (elements[0] is _Error)) {
+                if (elements.size == 1 && elements[0] is _Error) {
                     return elements[0]
                 }
                 return _Array(elements)
@@ -237,7 +237,7 @@ class Evaluator {
         var result: _Object? = null
         for (stmt in stmts) {
             result = eval(stmt, env)
-            if ((result is _ReturnValue) or (result is _Error)) {
+            if ((result is _ReturnValue) || (result is _Error)) {
                 // return itself
                 return result
             }
