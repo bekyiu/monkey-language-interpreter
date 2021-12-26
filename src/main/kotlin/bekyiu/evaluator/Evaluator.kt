@@ -63,10 +63,44 @@ class Evaluator {
                 }
                 applyFunction(func, args)
             }
+            is ArrayLiteral -> {
+                val elements = evalExpressions(node.elements, env)
+                if ((elements.size == 1) and (elements[0] is _Error)) {
+                    return elements[0]
+                }
+                return _Array(elements)
+            }
+            is IndexExpression -> {
+                val left = eval(node.left, env)
+                if (left is _Error) {
+                    return left
+                }
+                val index = eval(node.index, env)
+                if (index is _Error) {
+                    return index
+                }
+                return evalIndexExpression(left!!, index!!)
+            }
             else -> null
         }
         // println(v)
         return v
+    }
+
+    private fun evalIndexExpression(left: _Object, index: _Object): _Object {
+        return when {
+            left.type() == _ObjectType.ARRAY && index.type() == _ObjectType.INTEGER -> {
+                evalArrayIndexExpression(left as _Array, index as _Integer)
+            }
+            else -> _Error("index operator not supported: ${left.type()}")
+        }
+    }
+
+    private fun evalArrayIndexExpression(left: _Array, index: _Integer): _Object {
+        if (index.value < 0 || index.value >= left.elements.size) {
+            return _Null.NULL
+        }
+        return left.elements[index.value.toInt()]
     }
 
     private fun applyFunction(func: _Object?, args: MutableList<_Object>): _Object? {

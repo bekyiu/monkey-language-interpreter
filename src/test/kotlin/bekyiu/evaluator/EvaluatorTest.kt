@@ -12,6 +12,41 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testIndexExpression() {
+        class Sample(val input: String, val expected: Long)
+
+        val cases = listOf(
+            Sample("[1][0]", 1),
+            Sample("[1, 2, 3][2];", 3),
+            Sample("let i = 0; [7][i]", 7),
+            Sample("let arr = [1, 2 + 2, 3]; arr[0 + 1];", 4),
+            // return null
+//            Sample("[1, 2, 3][3];", 0),
+            // return null
+//            Sample("[1, 2, 3][-1];", 0),
+
+        )
+        for (case in cases) {
+            val v = testEval(case.input)
+            // println(v)
+            testIntegerObject(v, case.expected)
+        }
+    }
+
+    @Test
+    fun testArrayLiteral() {
+        val input = """
+            [1, 2 / 2, 2 + 2]
+        """.trimIndent()
+
+        var evaluated = testEval(input)
+        evaluated = evaluated as _Array
+        testIntegerObject(evaluated.elements[0], 1)
+        testIntegerObject(evaluated.elements[1], 1)
+        testIntegerObject(evaluated.elements[2], 4)
+    }
+
+    @Test
     fun testBuiltinFunctions() {
         class Sample(val input: String, val expected: Long)
 

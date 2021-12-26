@@ -13,4 +13,5 @@ enum class _ObjectType(val type: String) {
     FUNCTION("FUNCTION"),
     STRING("STRING"),
     BUILTIN("BUILTIN"),
+    ARRAY("ARRAY"),
 }
