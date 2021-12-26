@@ -24,7 +24,7 @@ class CallExpression(
 
         return StringBuilder(1024)
             .append(function.toString())
-            .append(args.joinToString(prefix = " (", postfix = ") "))
+            .append(args.joinToString(prefix = "(", postfix = ")"))
             .toString()
     }
 }

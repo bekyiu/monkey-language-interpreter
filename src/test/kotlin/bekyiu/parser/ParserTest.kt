@@ -13,6 +13,43 @@ import org.junit.Test
 class ParserTest {
 
     @Test
+    fun testIndexExpression() {
+        val source = """
+            arr[1 + 1];
+        """.trimIndent()
+        val lexer = Lexer(source)
+        val parser = Parser(lexer)
+        val program = parser.parseProgram()
+        assert(program.statements.size == 1)
+        assert(program.statements[0] is ExpressionStatement)
+
+        val expressionStatement = program.statements[0] as ExpressionStatement
+        val indexExp = expressionStatement.expression as IndexExpression
+        assert(indexExp.left.toString() == "arr")
+        assert(indexExp.index.toString() == "(1 + 1)")
+        println(indexExp)
+    }
+
+    @Test
+    fun testArrayLiteral() {
+        val source = """
+            [1, 2, 3 + 4]
+        """.trimIndent()
+        val lexer = Lexer(source)
+        val parser = Parser(lexer)
+        val program = parser.parseProgram()
+        assert(program.statements.size == 1)
+        assert(program.statements[0] is ExpressionStatement)
+
+        val expressionStatement = program.statements[0] as ExpressionStatement
+        val arr = expressionStatement.expression as ArrayLiteral
+        assert(arr.elements[0].toString() == "1")
+        assert(arr.elements[1].toString() == "2")
+        assert(arr.elements[2].toString() == "(3 + 4)")
+        println(arr)
+    }
+
+    @Test
     fun testStringLiteral() {
         val source = """
             "hello, world";
@@ -97,6 +134,8 @@ class ParserTest {
             PrecedenceTest("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),
             PrecedenceTest("(1 + 2) * 3", "((1 + 2) * 3)"),
             PrecedenceTest("-(1 + 2) * 3 / (7 + 7)", "(((-(1 + 2)) * 3) / (7 + 7))"),
+            PrecedenceTest("a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"),
+            PrecedenceTest("add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"),
         )
 
         for (case in cases) {

@@ -62,6 +62,8 @@ class Lexer(
             '<' -> Token(TokenType.LT, ch.toString())
             '>' -> Token(TokenType.GT, ch.toString())
             '"' -> Token(TokenType.STRING, readString())
+            '[' -> Token(TokenType.LBRACKET, ch.toString())
+            ']' -> Token(TokenType.RBRACKET, ch.toString())
             '=' -> {
                 if (peekChar() == '=') {
                     readChar()

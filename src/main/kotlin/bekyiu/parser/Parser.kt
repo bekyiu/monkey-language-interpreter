@@ -45,6 +45,7 @@ class Parser(
         registerPrefix(TokenType.IF, ::parseIfExpression)
         registerPrefix(TokenType.FUNCTION, ::parseFunctionLiteral)
         registerPrefix(TokenType.STRING, ::parseStringLiteral)
+        registerPrefix(TokenType.LBRACKET, ::parseArrayLiteral)
 
         registerInfix(TokenType.PLUS, ::parseInfixExpression)
         registerInfix(TokenType.MINUS, ::parseInfixExpression)
@@ -55,6 +56,7 @@ class Parser(
         registerInfix(TokenType.LT, ::parseInfixExpression)
         registerInfix(TokenType.GT, ::parseInfixExpression)
         registerInfix(TokenType.LPAREN, ::parseCallExpression)
+        registerInfix(TokenType.LBRACKET, ::parseIndexExpression)
     }
 
     companion object {
@@ -69,6 +71,7 @@ class Parser(
             TokenType.SLASH to Precedence.PRODUCT,
             TokenType.ASTERISK to Precedence.PRODUCT,
             TokenType.LPAREN to Precedence.CALL,
+            TokenType.LBRACKET to Precedence.INDEX
         )
     }
 
@@ -284,6 +287,16 @@ class Parser(
         return args
     }
 
+    // <expression>[<expression>]
+    private fun parseIndexExpression(left: Expression): Expression {
+        // [
+        val token = curToken
+        nextToken()
+        val indexExp = parseExpression(Precedence.LOWEST)
+        expectPeek(TokenType.RBRACKET)
+        return IndexExpression(token, left, indexExp)
+    }
+
     // return <expression>;
     private fun parseReturnStatement(): Statement {
         // RETURN
@@ -309,6 +322,27 @@ class Parser(
             nextToken()
         }
         return LetStatement(token, ident, value)
+    }
+
+    // [<expression, expression, ...>]
+    private fun parseArrayLiteral(): Expression {
+        val elements = mutableListOf<Expression>()
+        // cur token: [
+        val ret = ArrayLiteral(curToken, elements)
+        if (peekTokenIs(TokenType.RBRACKET)) {
+            nextToken()
+            return ret
+        }
+
+        nextToken()
+        elements.add(parseExpression(Precedence.LOWEST))
+        while (peekTokenIs(TokenType.COMMA)) {
+            nextToken()
+            nextToken()
+            elements.add(parseExpression(Precedence.LOWEST))
+        }
+        expectPeek(TokenType.RBRACKET)
+        return ret
     }
 
     private fun expectPeek(type: TokenType) {

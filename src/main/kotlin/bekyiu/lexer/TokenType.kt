@@ -24,6 +24,8 @@ enum class TokenType(val literal: String) {
     GT(">"),
     EQ("=="),
     NOT_EQ("!="),
+    LBRACKET("["),
+    RBRACKET("]"),
 
     // Delimiters
     COMMA(","),

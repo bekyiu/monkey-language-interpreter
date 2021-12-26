@@ -25,6 +25,9 @@ enum class Precedence(val p: Int) {
 
     // add(x)
     CALL(7),
+
+    // a[0]
+    INDEX(8),
     ;
 
     fun lt(precedence: Precedence) = this.p < precedence.p

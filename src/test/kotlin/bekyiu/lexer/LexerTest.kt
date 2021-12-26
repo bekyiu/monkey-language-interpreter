@@ -31,6 +31,7 @@ class LexerTest {
         "nishino nanase";
         "a asuka ";
         "";
+        [1, 2];
     """
 
         val lexer = Lexer(source)
