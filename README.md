@@ -1,6 +1,7 @@
 # The implementation of Monkey Language by kotlin
 ## What is Monkey
 Monkey Language is a language created to learn how interpreter/compiler works
+
 Here is the official website: https://monkeylang.org/
 
 ## What Monkey looks like
@@ -73,7 +74,7 @@ fun main(args: Array<String>) {
     evalFromFile(args[0])
 }
 ```
-you can write the monkey code in a single file and pass the full file path by program arguments
+You can write the monkey code in a single file and pass the full file path by program arguments
 or run the REPL like this:
 ![avatar](./images/img3.png)
 
