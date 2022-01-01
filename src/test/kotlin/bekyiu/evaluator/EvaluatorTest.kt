@@ -12,6 +12,27 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testHashIndexExpression() {
+        class Sample(val input: String, val expected: Any)
+        val cases = listOf(
+            Sample(""" {"foo": 5}["foo"] """, 5L),
+            Sample(""" {"foo": 5}["a"] """, _Null.NULL),
+            Sample(""" {}["foo"] """, _Null.NULL),
+            Sample(""" {5: 1}[5] """, 1L),
+            Sample(""" {true: 1}[true] """, 1L),
+        )
+
+        for (case in cases) {
+            val ret = testEval(case.input)
+            if (ret is _Integer) {
+                testIntegerObject(ret, case.expected as Long)
+            } else {
+                testNullObject(ret)
+            }
+        }
+    }
+
+    @Test
     fun testHashLiteral() {
         val input = """
             let two = "two";

@@ -112,8 +112,18 @@ class Evaluator {
             left.type() == _ObjectType.ARRAY && index.type() == _ObjectType.INTEGER -> {
                 evalArrayIndexExpression(left as _Array, index as _Integer)
             }
+            left.type() == _ObjectType.HASH -> {
+                evalHashIndexExpression(left as _Hash, index)
+            }
             else -> _Error("index operator not supported: ${left.type()}")
         }
+    }
+
+    private fun evalHashIndexExpression(hash: _Hash, index: _Object): _Object {
+        if (index !is _Hashable) {
+            return _Error("unusable as hash key: ${index.type()}")
+        }
+        return hash.pairs[index] ?: _Null.NULL
     }
 
     private fun evalArrayIndexExpression(left: _Array, index: _Integer): _Object {

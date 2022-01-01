@@ -12,6 +12,7 @@ var builtins = mapOf(
     "last" to _Builtin(::last),
     "rest" to _Builtin(::rest),
     "push" to _Builtin(::push),
+    "puts" to _Builtin(::puts),
 )
 
 // typealias BuiltinFunction = (List<_Object>) -> _Object
@@ -112,4 +113,12 @@ private fun push(args: List<_Object>): _Object {
                     "expected: ${_ObjectType.ARRAY}"
         )
     }
+}
+
+
+private fun puts(args: List<_Object>): _Object {
+    for (arg in args) {
+        println(arg)
+    }
+    return _String("")
 }
