@@ -9,7 +9,7 @@ import bekyiu.ast.*
  */
 class Evaluator {
 
-    fun eval(node: Node, env: Environment): _Object? {
+    fun eval(node: Node, env: Environment): _Object {
         val v = when (node) {
             is Program -> evalProgram(node.statements, env)
             is ExpressionStatement -> eval(node.expression, env)
@@ -26,7 +26,7 @@ class Evaluator {
                 if (right is _Error) {
                     return right
                 }
-                evalPrefixExpression(node.operator, right!!)
+                evalPrefixExpression(node.operator, right)
             }
             is InfixExpression -> {
                 val left = eval(node.left, env)
@@ -37,12 +37,12 @@ class Evaluator {
                 if (right is _Error) {
                     return right
                 }
-                evalInfixExpression(node.operator, left!!, right!!)
+                evalInfixExpression(node.operator, left, right)
             }
             is ReturnStatement -> {
                 when (val v = eval(node.returnValue, env)) {
                     is _Error -> return v
-                    else -> _ReturnValue(v!!)
+                    else -> _ReturnValue(v)
                 }
             }
             is LetStatement -> {
@@ -50,7 +50,7 @@ class Evaluator {
                 if (v is _Error) {
                     return v
                 }
-                env.set(node.name.value, v!!)
+                env.set(node.name.value, v)
             }
             is CallExpression -> {
                 // object._Function
@@ -80,9 +80,9 @@ class Evaluator {
                 if (index is _Error) {
                     return index
                 }
-                return evalIndexExpression(left!!, index!!)
+                return evalIndexExpression(left, index)
             }
-            else -> null
+            else -> _Error("unknown node type: $node")
         }
         // println(v)
         return v
@@ -96,7 +96,7 @@ class Evaluator {
                 return key
             }
             if (key !is _Hashable) {
-                return _Error("unusable as hash key: ${key?.type()}")
+                return _Error("unusable as hash key: ${key.type()}")
             }
             val value = eval(v, env)
             if (value is _Error) {
@@ -133,7 +133,7 @@ class Evaluator {
         return left.elements[index.value.toInt()]
     }
 
-    private fun applyFunction(func: _Object?, args: MutableList<_Object>): _Object? {
+    private fun applyFunction(func: _Object?, args: MutableList<_Object>): _Object {
         return when (func) {
             is _Function -> {
                 val curEnv = Environment(outer = func.env)
@@ -164,7 +164,7 @@ class Evaluator {
                 ret.add(p)
                 return ret
             }
-            ret.add(p!!)
+            ret.add(p)
         }
         return ret
     }
@@ -173,13 +173,13 @@ class Evaluator {
         return env.get(node.value) ?: builtins[node.value] ?: _Error("identifier not found: ${node.value}")
     }
 
-    private fun evalIfExpression(node: IfExpression, env: Environment): _Object? {
+    private fun evalIfExpression(node: IfExpression, env: Environment): _Object {
         val cond = eval(node.condition, env)
         return when {
             cond is _Error -> cond
-            isTruthy(cond!!) -> eval(node.consequence, env)
+            isTruthy(cond) -> eval(node.consequence, env)
             node.alternative != null -> eval(node.alternative!!, env)
-            else -> null
+            else -> _Null.NULL
         }
     }
 
@@ -263,8 +263,8 @@ class Evaluator {
     // we can’t unwrap the value of _ReturnValue on first sight
     // because we need to further keep track of it
     // so we can stop the execution in the outermost block statement
-    private fun evalBlockStatement(stmts: MutableList<Statement>, env: Environment): _Object? {
-        var result: _Object? = null
+    private fun evalBlockStatement(stmts: MutableList<Statement>, env: Environment): _Object {
+        var result: _Object = _Null.NULL
         for (stmt in stmts) {
             result = eval(stmt, env)
             if ((result is _ReturnValue) || (result is _Error)) {
@@ -275,8 +275,8 @@ class Evaluator {
         return result
     }
 
-    private fun evalProgram(stmts: MutableList<Statement>, env: Environment): _Object? {
-        var result: _Object? = null
+    private fun evalProgram(stmts: MutableList<Statement>, env: Environment): _Object {
+        var result: _Object = _Null.NULL
         for (stmt in stmts) {
             result = eval(stmt, env)
             when (result) {

@@ -138,7 +138,7 @@ class EvaluatorTest {
     fun testRecursive() {
         val input = """
             let counter = fn(x) {
-                if (x > 800) {
+                if (x > 80) {
                     return true;
                 } else {
                     let foobar = 9999;
@@ -277,6 +277,7 @@ class EvaluatorTest {
 
     fun testNullObject(obj: _Object): Boolean {
         println("====")
+        assert(obj == _Null.NULL)
         if (obj != _Null.NULL) {
             System.err.println("obj不是null")
             return false
@@ -355,7 +356,7 @@ class EvaluatorTest {
         val program = p.parseProgram()
         val e = Evaluator()
         val env = Environment()
-        return e.eval(program, env) ?: _Null.NULL
+        return e.eval(program, env)
     }
 
     fun testIntegerObject(obj: _Object, expected: Long) {
