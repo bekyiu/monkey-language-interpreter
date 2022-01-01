@@ -20,6 +20,7 @@ class Evaluator {
             is Identifier -> evalIdentifier(node, env)
             is StringLiteral -> _String(node.value)
             is FunctionLiteral -> _Function(node.parameters, node.body, env)
+            is HashLiteral -> evalHashLiteral(node, env)
             is PrefixExpression -> {
                 val right = eval(node.right, env)
                 if (right is _Error) {
@@ -85,6 +86,25 @@ class Evaluator {
         }
         // println(v)
         return v
+    }
+
+    private fun evalHashLiteral(node: HashLiteral, env: Environment): _Object {
+        val pairs = mutableMapOf<_Hashable, _Object>()
+        node.pairs.forEach { (k, v) ->
+            val key = eval(k, env)
+            if (key is _Error) {
+                return key
+            }
+            if (key !is _Hashable) {
+                return _Error("unusable as hash key: ${key?.type()}")
+            }
+            val value = eval(v, env)
+            if (value is _Error) {
+                return value
+            }
+            pairs[key] = value!!
+        }
+        return _Hash(pairs)
     }
 
     private fun evalIndexExpression(left: _Object, index: _Object): _Object {

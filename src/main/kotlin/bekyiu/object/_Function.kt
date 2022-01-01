@@ -9,7 +9,7 @@ import java.lang.StringBuilder
  * @Date 2021/12/19 7:47 下午
  * @Created by bekyiu
  */
-class _Function(
+data class _Function(
     val parameters: MutableList<Identifier>,
     val body: BlockStatement,
     // the environment where the function is located, not the environment where the function is used

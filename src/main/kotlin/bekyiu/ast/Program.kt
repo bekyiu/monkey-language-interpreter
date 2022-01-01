@@ -6,7 +6,7 @@ package bekyiu.ast
  */
 // root node of every ast
 // every valid money program is a series of statements
-class Program(
+data class Program(
     var statements: MutableList<Statement>
 ) : Node {
 

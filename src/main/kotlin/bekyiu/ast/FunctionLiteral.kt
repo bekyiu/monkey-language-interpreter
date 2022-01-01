@@ -7,7 +7,7 @@ import java.lang.StringBuilder
  * @Date 2021/12/12 12:43 下午
  * @Created by bekyiu
  */
-class FunctionLiteral(
+data class FunctionLiteral(
     // fn
     val token: Token,
     val parameters: MutableList<Identifier>,

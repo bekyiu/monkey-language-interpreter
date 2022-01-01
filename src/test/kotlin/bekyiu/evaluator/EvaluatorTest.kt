@@ -12,6 +12,31 @@ import org.junit.Test
 class EvaluatorTest {
 
     @Test
+    fun testHashLiteral() {
+        val input = """
+            let two = "two";
+            {
+                "one": 10 - 9,
+                two: 1 + 1,
+                "thr" + "ee": 6 / 2,
+                4: 4,
+                true: 5,
+                false: 6
+            }
+        """.trimIndent()
+
+        var evaluated = testEval(input)
+        evaluated = evaluated as _Hash
+
+        testIntegerObject(evaluated.pairs[_String("one")]!!, 1)
+        testIntegerObject(evaluated.pairs[_String("two")]!!, 2)
+        testIntegerObject(evaluated.pairs[_String("three")]!!, 3)
+        testIntegerObject(evaluated.pairs[_Integer(4)]!!, 4)
+        testIntegerObject(evaluated.pairs[_Boolean.TRUE]!!, 5)
+        testIntegerObject(evaluated.pairs[_Boolean.FALSE]!!, 6)
+    }
+
+    @Test
     fun testIndexExpression() {
         class Sample(val input: String, val expected: Long)
 

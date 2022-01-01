@@ -6,7 +6,7 @@ import bekyiu.lexer.Token
  * @Date 2021/12/4 1:24 下午
  * @Created by bekyiu
  */
-class LetStatement(
+data class LetStatement(
     // LET
     val token: Token,
     // hold the identifier of the binding

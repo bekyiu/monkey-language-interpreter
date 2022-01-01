@@ -6,7 +6,7 @@ import bekyiu.lexer.Token
  * @Date 2021/12/6 6:25 下午
  * @Created by bekyiu
  */
-class Bool(
+data class Bool(
     val token: Token,
     val value: Boolean,
 ) : Expression {

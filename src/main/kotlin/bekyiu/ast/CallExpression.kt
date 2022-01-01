@@ -7,7 +7,7 @@ import java.lang.StringBuilder
  * @Date 2021/12/12 3:32 下午
  * @Created by bekyiu
  */
-class CallExpression(
+data class CallExpression(
     // (
     val token: Token,
     // identifier or function literal

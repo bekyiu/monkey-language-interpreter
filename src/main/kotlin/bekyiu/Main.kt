@@ -17,8 +17,8 @@ import java.util.*
  * @Created by bekyiu
  */
 fun main(args: Array<String>) {
-    repl()
-//    evalFromFile(args[0])
+//    repl()
+    evalFromFile(args[0])
 }
 
 private fun evalFromFile(filename: String) {

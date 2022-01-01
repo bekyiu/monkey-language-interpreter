@@ -6,7 +6,7 @@ import bekyiu.lexer.Token
  * @Date 2021/12/5 5:44 下午
  * @Created by bekyiu
  */
-class PrefixExpression(
+data class PrefixExpression(
     // prefix token like ! or -
     val token: Token,
     val operator: String,

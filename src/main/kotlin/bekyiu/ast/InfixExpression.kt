@@ -6,7 +6,7 @@ import bekyiu.lexer.Token
  * @Date 2021/12/6 11:16 上午
  * @Created by bekyiu
  */
-class InfixExpression(
+data class InfixExpression(
     // the operator token like +
     val token: Token,
     val left: Expression,

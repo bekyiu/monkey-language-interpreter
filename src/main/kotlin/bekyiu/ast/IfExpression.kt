@@ -7,7 +7,7 @@ import java.lang.StringBuilder
  * @Date 2021/12/12 11:08 上午
  * @Created by bekyiu
  */
-class IfExpression(
+data class IfExpression(
     // if
     val token: Token,
     val condition: Expression,

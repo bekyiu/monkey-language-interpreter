@@ -11,7 +11,7 @@ class ParseException : RuntimeException {
 
     constructor(expected: TokenType, actual: Token) : super(
         "parse error, expected: ${expected.literal}, " +
-                "actually: ${actual.type.literal}(${actual.literal})"
+                "actually: ${actual.type.literal} (${actual.literal})"
     )
 
     constructor(msg: String) : super("parse error: $msg")

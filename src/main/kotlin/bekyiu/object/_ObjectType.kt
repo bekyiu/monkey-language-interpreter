@@ -14,4 +14,5 @@ enum class _ObjectType(val type: String) {
     STRING("STRING"),
     BUILTIN("BUILTIN"),
     ARRAY("ARRAY"),
+    HASH("HASH"),
 }

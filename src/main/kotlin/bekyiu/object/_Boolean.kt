@@ -6,7 +6,7 @@ import kotlin.Boolean
  * @Date 2021/12/12 8:45 下午
  * @Created by bekyiu
  */
-class _Boolean private constructor(var value: Boolean) : _Object {
+class _Boolean private constructor(var value: Boolean) : _Object, _Hashable {
 
     companion object {
         val TRUE = _Boolean(true)

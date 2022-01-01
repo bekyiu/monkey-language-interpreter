@@ -6,7 +6,7 @@ import bekyiu.lexer.Token
  * @Date 2021/12/25 3:13 下午
  * @Created by bekyiu
  */
-class ArrayLiteral(
+data class ArrayLiteral(
     // [
     val token: Token,
     var elements: MutableList<Expression>

@@ -5,7 +5,7 @@ package bekyiu.`object`
  * @Created by bekyiu
  */
 
-class _Error(
+data class _Error(
     val message: String
 ) : _Object {
     override fun type() = _ObjectType.ERROR

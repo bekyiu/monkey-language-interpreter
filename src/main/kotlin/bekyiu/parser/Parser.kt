@@ -46,6 +46,7 @@ class Parser(
         registerPrefix(TokenType.FUNCTION, ::parseFunctionLiteral)
         registerPrefix(TokenType.STRING, ::parseStringLiteral)
         registerPrefix(TokenType.LBRACKET, ::parseArrayLiteral)
+        registerPrefix(TokenType.LBRACE, ::parseHashLiteral)
 
         registerInfix(TokenType.PLUS, ::parseInfixExpression)
         registerInfix(TokenType.MINUS, ::parseInfixExpression)
@@ -136,6 +137,35 @@ class Parser(
             leftExp = infixFn(leftExp)
         }
         return leftExp
+    }
+
+    // {<expression> : <expression>, <expression> : <expression>, ... }
+    private fun parseHashLiteral(): Expression {
+        val pairs = mutableMapOf<Expression, Expression>()
+        val hash = HashLiteral(curToken, pairs)
+        if (peekTokenIs(TokenType.RBRACE)) {
+            nextToken()
+            return hash
+        }
+
+        while (!curTokenIs(TokenType.RBRACE)) {
+            nextToken()
+            val key = parseExpression(Precedence.LOWEST)
+            expectPeek(TokenType.COLON)
+            // skip ':'
+            nextToken()
+            val value = parseExpression(Precedence.LOWEST)
+            pairs[key] = value
+            if (peekTokenIs(TokenType.COMMA) || peekTokenIs(TokenType.RBRACE)) {
+                nextToken()
+            } else {
+                throw ParseException(
+                    "expected: ${TokenType.COMMA} or ${TokenType.RBRACE}, " +
+                            "actually: ${peekToken.type.literal} (${peekToken.literal})"
+                )
+            }
+        }
+        return hash
     }
 
     // fn <parameters> <block statement>

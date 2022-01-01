@@ -7,7 +7,7 @@ import bekyiu.lexer.Token
  * @Created by bekyiu
  */
 // like this: a[0]
-class IndexExpression(
+data class IndexExpression(
     // [
     val token: Token,
     // a

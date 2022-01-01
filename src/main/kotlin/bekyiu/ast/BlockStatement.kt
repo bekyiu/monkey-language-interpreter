@@ -8,7 +8,7 @@ import java.lang.StringBuilder
  * @Created by bekyiu
  */
 // Block statements are a series of statements enclosed by an opening { and a closing }
-class BlockStatement(
+data class BlockStatement(
     // {
     val token: Token,
     val statements: MutableList<Statement>

@@ -8,7 +8,7 @@ import bekyiu.lexer.Token
  */
 // it’s a statement that consists solely of one expression
 // we can push the expression to statements list
-class ExpressionStatement(
+data class ExpressionStatement(
     // the first token of the expression
     val token: Token,
     var expression: Expression,

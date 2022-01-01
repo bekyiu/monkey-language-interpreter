@@ -6,7 +6,7 @@ import bekyiu.lexer.Token
  * @Date 2021/12/4 4:32 下午
  * @Created by bekyiu
  */
-class ReturnStatement(
+data class ReturnStatement(
     val token: Token,
     val returnValue: Expression,
 ) : Statement {

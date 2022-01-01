@@ -11,6 +11,33 @@ import org.junit.Test
  * @Created by bekyiu
  */
 class ParserTest {
+    @Test
+    fun testHashInKt() {
+        val map = mutableMapOf<Expression, Expression>(
+            Identifier(Token(TokenType.IDENT, "a"), "a") to
+                    Identifier(Token(TokenType.IDENT, "ret"), "ret")
+        )
+        val i = Identifier(Token(TokenType.IDENT, "a"), "a")
+        println(map[i])
+    }
+
+    @Test
+    fun testHashLiteral() {
+        val source = """
+            {"one": 1 + 0, 2: 1 + 1, true: 3 + 0}
+        """.trimIndent()
+        val lexer = Lexer(source)
+        val parser = Parser(lexer)
+        val program = parser.parseProgram()
+        assert(program.statements.size == 1)
+        assert(program.statements[0] is ExpressionStatement)
+
+        val expressionStatement = program.statements[0] as ExpressionStatement
+        val hash = expressionStatement.expression as HashLiteral
+        assert(hash.tokenLiteral() == "{")
+        assert(hash.pairs.size == 3)
+        println(hash.pairs)
+    }
 
     @Test
     fun testIndexExpression() {

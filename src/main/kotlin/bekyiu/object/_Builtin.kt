@@ -7,7 +7,7 @@ package bekyiu.`object`
  */
 typealias BuiltinFunction = (List<_Object>) -> _Object
 
-class _Builtin(
+data class _Builtin(
     val fn: BuiltinFunction
 ) : _Object {
 

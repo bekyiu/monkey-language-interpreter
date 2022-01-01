@@ -20,14 +20,9 @@ let reduce = fn(arr, initial, f) {
     iter(arr, initial)
 }
 
-let sum = fn(arr) {
-    reduce(arr, 0, fn(initial, el) { initial + el })
-}
-
+let sum = fn(arr) { reduce(arr, 0, fn(initial, el) { initial + el }) }
 
 let a = [1, 2, 3, 4]
-let double = fn(x) {
-    x * 2
-}
+let double = fn(x) { x * 2 }
 let b = map(a, double)
 sum(b)
