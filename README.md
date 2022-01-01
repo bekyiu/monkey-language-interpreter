@@ -65,7 +65,7 @@ The result:
 ![avatar](./images/img2.png)
 
 ## Where to start
-The source code tested successfully with kotlin1.6 and on jdk11
+The source code tested successfully with kotlin1.6 and jdk11
 
 The program entry is in file: src/main/kotlin/bekyiu/Main.kt
 ```
